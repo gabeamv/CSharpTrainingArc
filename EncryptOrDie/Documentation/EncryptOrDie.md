@@ -1,13 +1,13 @@
 # Encrypt Or Die Game
 
-**Overview**
+**Overview**<br>
 The user is trying to send a message to someone for rescue because someone is trying to kill them.
 The user, before they can send the message, must encrypt the message and send it on a specific frequency.
 The killer can guess the frequency that the user is using. When the killer guesses the frequency, 
 the killer can decrypt the message and find the user. If the killer does not guess the user's frequency in
 five tries, the user is safe and rescue is on the way.
 
-**Learning Objectives**
+**Learning Objectives**<br>
 I just read chapters 1-3 and I wanted to start simple. My goal for this project was to implement with
 some C# concepts I was reading about such as:
 
@@ -18,7 +18,7 @@ some C# concepts I was reading about such as:
 - if/else statements
 - loops
 
-**Extra Concepts Implemented**
+**Extra Concepts Implemented**<br>
 Having experience with Java and Kotlin, I wanted to also try to decouple my code into separate classes, even though
 the chapters that I have read so far do not cover OOP concepts such as classes, inheritance, polymorphism, etc.
 If I wanted to, I can try refactor this code to use OOP concepts later on, but for now, I just wanted to focus on
@@ -31,7 +31,7 @@ since the same project I stated is going to be utilizing that.
 
 Encryption was implemented with the [microsoft.learn.com](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.cryptostream?view=net-9.0)
 
-**Game Flow**
+**Game Flow**<br>
 The user is prompted to enter their name. Afterwards, the user is prompted to enter a message which should contain
 X, Y coordinates for their location (1-99). The user is prompted five times to enter a frequency (1-5), and each
 time there is a check to see if the frequency matches the killer's randomly generated frequency. If the frequencies
