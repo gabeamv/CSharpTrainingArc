@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardGames
+namespace CardGames.Interfaces
 {
-    internal interface ICardCompare
+    internal interface ICompare
     {
+        protected bool CompareHand(List<Card> card1, List<Card> card2);
     }
 }
