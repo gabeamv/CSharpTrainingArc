@@ -18,6 +18,7 @@ namespace CardGames.Games
         private List<Card> DealerHand;
         private Deck Deck;
         public bool IsRunning = false;
+
         public BlackJackGame()
         {
             Deck = new Deck();
@@ -34,6 +35,7 @@ namespace CardGames.Games
                 Console.WriteLine("Shuffling the deck...");
                 Deck.Shuffle();
                 Console.WriteLine("Dealing cards...");
+                Console.WriteLine();
                 PlayTurn();
                 ReturnCards();
                 IsRunning = PlayAgain();
@@ -53,8 +55,10 @@ namespace CardGames.Games
                 Deal(UserHand, Deck);
                 Deal(DealerHand, Deck);
             }
-            Console.WriteLine("Your hand: " + string.Join(", ", UserHand));
-            Console.WriteLine("Dealer's hand: " + DealerHand[0] + ", Unknown");
+            Console.WriteLine("Your hand:");
+            DisplayHand(UserHand);
+            Console.WriteLine("Dealer's hand:");
+            DisplayHand(DealerHand.Take(1).ToList()); // Show only one dealer card
             string userChoice = PromptHit();
 
             if (userChoice == HIT && !IsBlackJack(UserHand))
@@ -63,7 +67,10 @@ namespace CardGames.Games
                 {
                     Deal(UserHand, Deck);
                     if (IsBust(UserHand) || IsBlackJack(UserHand)) break;
+                    Console.WriteLine("Your hand:");
                     DisplayHand(UserHand);
+                    Console.WriteLine("Dealer's hand:");
+                    DisplayHand(DealerHand.Take(1).ToList()); // Show only one dealer card
                     userChoice = PromptHit();
 
                 } while (userChoice == HIT);
@@ -126,6 +133,7 @@ namespace CardGames.Games
                 Console.WriteLine("Invalid choice. Please enter 'h' to hit or 's' to stand.");
                 userChoice = Console.ReadLine();
             }
+            Console.WriteLine();
             return userChoice.ToLower();
         }
 
@@ -168,10 +176,12 @@ namespace CardGames.Games
 
         private void DisplayHand(List<Card> hand)
         {
-            foreach (Card card in hand)
-            {
-                Console.WriteLine(card);
-            }
+            StringBuilder sbHand = new StringBuilder();
+            (int value, int aceElevenValue) = HandValue(hand);
+            if (aceElevenValue <= BLACKJACK) sbHand.Append($"Value: {aceElevenValue}\n");
+            else sbHand.Append($"Value: {value}\n");
+            foreach (Card card in hand) sbHand.Append(card.ToString() + "\n");
+            Console.WriteLine(sbHand.ToString());
         }
 
         private void ReturnCards()
@@ -202,6 +212,7 @@ namespace CardGames.Games
                 Console.WriteLine("Invalid choice. Please enter 'y' to play again or 'n' to exit.");
                 userChoice = Console.ReadLine();
             }
+            Console.WriteLine();
             return userChoice == "y";
         }
     }
