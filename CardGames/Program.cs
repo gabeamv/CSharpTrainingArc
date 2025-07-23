@@ -6,11 +6,8 @@ namespace CardGames
     {
         static void Main(string[] args)
         {
-            Deck deck = new Deck();
-            Console.WriteLine(deck);
-            deck.Shuffle();
-            Console.WriteLine($"Shuffled Deck:\n{deck}");
-            //BlackJackGame blackJack = new BlackJackGame();
+            BlackJackGame blackJackGame = new BlackJackGame();
+            blackJackGame.Start();
         }
     }
 }

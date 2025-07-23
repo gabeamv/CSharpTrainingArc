@@ -23,13 +23,13 @@ namespace CardGames
         Ten, 
         Jack, 
         Queen, 
-        King // 13
+        King
     }
     
     public class Card
     {
         public Suit Suit { get;}
-        public Rank Rank { get;}
+        public Rank Rank { get; set; }
 
         public Card(Suit suit, Rank rank)
         {
@@ -39,7 +39,7 @@ namespace CardGames
 
         public override string ToString()
         {
-            return $"{Rank} of {Suit}\n";
+            return $"{Rank} of {Suit}";
         }
     }
 }

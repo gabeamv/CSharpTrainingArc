@@ -16,7 +16,7 @@ namespace CardGames
 
         public abstract void Start();
         protected abstract bool IsGameOver();
-        protected abstract void Deal();
+        protected abstract void Deal(List<Card> hand, Deck deck);
         protected abstract void PlayTurn();
         public abstract void End();
         

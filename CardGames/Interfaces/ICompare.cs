@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardGames.Interfaces
 {
-    internal interface ICompare
+    public interface ICompare
     {
         protected bool CompareHand(List<Card> card1, List<Card> card2);
     }
