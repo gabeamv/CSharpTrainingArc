@@ -8,3 +8,6 @@ I aim to build my own projects, mess up, and improve poor code that I had initia
 ## Mini Projects
 * [EncryptOrDie](./EncryptOrDie/Documentation/EncryptOrDie.md)
 * [CardGames](./CardGames/Documentation/CardGames.md)
+
+## Big Projects
+* [EncryptedFileDrop](https://github.com/gabeamv/EncryptedFileDrop)
