@@ -182,6 +182,8 @@ namespace CardGames.Games
             else sbHand.Append($"Value: {value}\n");
             foreach (Card card in hand) sbHand.Append(card.ToString() + "\n");
             Console.WriteLine(sbHand.ToString());
+            // If there is only one card in the hand, it is dealer's hand upon initial deal without the second card.
+            if (hand.Count == 1) Console.WriteLine("Another unknown card in dealer's hand.\n");
         }
 
         private void ReturnCards()
