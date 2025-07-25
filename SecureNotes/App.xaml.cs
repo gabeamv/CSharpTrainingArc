@@ -9,6 +9,7 @@ namespace SecureNotes
     /// </summary>
     public partial class App : Application
     {
+
     }
 
 }

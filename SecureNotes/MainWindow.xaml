@@ -4,9 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SecureNotes"
+        xmlns:userControls="clr-namespace:SecureNotes.View.UserControls"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <userControls:ClearableTextBox Placeholder="Username"/>
+            <userControls:ClearableTextBox Placeholder="Password"/>
+        </StackPanel>
+        
     </Grid>
 </Window>
