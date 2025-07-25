@@ -17,7 +17,7 @@ namespace CardGames.Games
         private List<Card> UserHand;
         private List<Card> DealerHand;
         private Deck Deck;
-        public bool IsRunning = false;
+        public bool IsRunning { get; private set; } = false;
 
         public BlackJackGame()
         {
