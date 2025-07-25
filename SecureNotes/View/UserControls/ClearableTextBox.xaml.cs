@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,21 +17,24 @@ using System.Windows.Shapes;
 namespace SecureNotes.View.UserControls
 {
 
-    public partial class ClearableTextBox : UserControl
+    public partial class ClearableTextBox : UserControl, INotifyPropertyChanged
     {
-        private string _Placeholder;
-        // Dangerous
-        public string Placeholder 
+        private string _BoundText;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string BoundText
         {
-            get { return _Placeholder; } 
+            get { return _BoundText; } 
 
             set {
-                _Placeholder = value;
-                TextInitial.Text = _Placeholder;
+                _BoundText= value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("BoundText"));
             } 
         }
         public ClearableTextBox()
         {
+            DataContext = this;
             InitializeComponent();
         }
 

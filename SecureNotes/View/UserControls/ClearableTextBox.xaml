@@ -12,7 +12,7 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="TextInput" VerticalAlignment="Center" Margin="5" Panel.ZIndex="1" Background="Transparent" 
                  TextChanged="TextInput_TextChanged"/>
-        <TextBlock x:Name="TextInitial" Text="{Binding Placeholder}" FontSize="12" HorizontalAlignment="Left" 
+        <TextBlock x:Name="TextInitial" Text="{Binding BoundText}" FontSize="12" HorizontalAlignment="Left" 
            VerticalAlignment="Center" Margin="10, 0, 0 ,0" FontWeight="ExtraLight"/>
         <Button x:Name="XButton" HorizontalAlignment="Right" VerticalAlignment="Center" Width="20" Content="X" 
                 FontSize="12" Margin="5" Background="Transparent" Panel.ZIndex="2" BorderThickness="0" 
