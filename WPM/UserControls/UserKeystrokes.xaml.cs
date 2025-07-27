@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SecureNotes.View.UserControls
+namespace WPM.UserControls
 {
     /// <summary>
-    /// Interaction logic for MenuBar.xaml
+    /// Interaction logic for UserKeystrokes.xaml
     /// </summary>
-    public partial class MenuBar : UserControl
+    public partial class UserKeystrokes : UserControl
     {
-        public MenuBar()
+        public UserKeystrokes()
         {
             InitializeComponent();
         }

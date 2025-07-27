@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        
         <!--
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -18,18 +19,11 @@
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <userControls:ClearableTextBox BoundText="Username"/>
                 <userControls:ClearableTextBox BoundText="Password"/>
+                <Button Name="LoginButton" Content="Login" Click="LoginButton_Click" Height="25" Width="70"/>
             </StackPanel>
         </Grid>
-        -->
-        
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <TextBox Name="txtInput" VerticalContentAlignment="Center" Width="250" Height="40" FontSize="16" Text="{Binding BoundText, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"/>
-        <Button Grid.Row="1" Name="btnSet" Content="Set" Width="100" Height="40" Click="btnSet_Click"/>
-        <TextBlock Grid.Row="2" Name="tbResult" FontSize="16" HorizontalAlignment="Center" Text="{Binding BoundText, UpdateSourceTrigger=PropertyChanged}"/>
 
+        -->
+        <ContentControl Content="{Binding CurrentViewModel}"/>
     </Grid>
 </Window>
