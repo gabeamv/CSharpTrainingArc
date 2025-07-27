@@ -20,7 +20,6 @@ namespace SecureNotes.Views
     /// </summary>
     public partial class AuthView : UserControl
     {
-
         public AuthView()
         {
             InitializeComponent();
