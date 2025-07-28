@@ -12,5 +12,11 @@
         <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
             <views:HomeView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:EncryptViewModel}">
+            <views:EncryptView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:DecryptViewModel}">
+            <views:DecryptView/>
+        </DataTemplate>
     </Application.Resources>
 </Application>

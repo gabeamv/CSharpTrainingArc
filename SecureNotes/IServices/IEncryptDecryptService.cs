@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace SecureNotes.IServices
 {
-    // Contract that viewmodels use to handle navigation
-    public interface INavigationService
+    public interface IEncryptDecryptService
     {
-        void NavigateTo(object viewModel) { }
+
     }
 }
