@@ -6,7 +6,22 @@
              xmlns:local="clr-namespace:SecureNotes.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBlock Text="Encrypt View"/>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <TextBlock Grid.Row="0" x:Name="Title" Text="Encrypt View" FontSize="32" HorizontalAlignment="Center"/>
+            <Button x:Name="HomeButton" Content="Go Home" FontSize="16" Command="{Binding NavigateHome}" 
+                    Width="100" Height="30" Margin="0, 10, 0 ,0"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button Content="Encrypt File" Command="{Binding EncryptFile}"/>
+        </StackPanel>
+        <TextBlock Grid.Row="2" x:Name="Testing" Text="{Binding TestOutput}" HorizontalAlignment="Center" 
+           VerticalAlignment="Center" FontSize="24"/>
     </Grid>
 </UserControl>

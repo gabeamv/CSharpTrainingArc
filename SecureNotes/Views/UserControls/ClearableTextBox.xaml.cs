@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,19 +20,33 @@ namespace SecureNotes.View.UserControls
 
     public partial class ClearableTextBox : UserControl, INotifyPropertyChanged
     {
-        private string _BoundText;
+        private string _TextLabel;
+        private string _UserText;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public string BoundText
+        public string TextLabel
         {
-            get { return _BoundText; } 
+            get { return _TextLabel; } 
 
             set {
-                _BoundText= value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("BoundText"));
+                _TextLabel = value;
+                OnPropertyChanged();
             } 
         }
+
+        public string UserText 
+        { 
+            get { return _UserText; }
+            set
+            {
+                _UserText = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+
         public ClearableTextBox()
         {
             DataContext = this;
@@ -51,6 +66,11 @@ namespace SecureNotes.View.UserControls
                 TextInitial.Visibility = Visibility.Hidden;
             }
             else { TextInitial.Visibility = Visibility.Visible; }
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
