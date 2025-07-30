@@ -8,7 +8,8 @@ namespace SecureNotes.IServices
 {
     public interface IFileService
     {
-        public byte[] ReadTxtFile(string path);
+        public byte[] ReadTxtFileAsBytes(string path);
+        public string ReadTxtFileAsString(string path);
         public void WriteBytesTxtFile(string path, byte[] bytes);
         public void WriteStringTxtFile(string path, string text);
         

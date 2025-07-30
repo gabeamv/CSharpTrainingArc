@@ -12,9 +12,9 @@ namespace SecureNotes.Services
 {
     public class EncryptDecryptService : IEncryptDecryptService
     {
-        private Aes AesAlg { get; } = Aes.Create();
-        public EncryptDecryptService() 
-        { 
+        // Static aes algorithm that persists throughout the lifetime of the application.
+        public static Aes AesAlg { get; private set; } = Aes.Create();
+        public EncryptDecryptService() { 
 
         }
 
@@ -24,52 +24,46 @@ namespace SecureNotes.Services
                 throw new ArgumentNullException(nameof(bytes));
             byte[] encryption;
 
-            using (Aes aesAlg = Aes.Create())
-            {
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+            ICryptoTransform encryptor = AesAlg.CreateEncryptor(AesAlg.Key, AesAlg.IV);
 
-                using (MemoryStream msEncrypt = new())
+            using (MemoryStream msEncrypt = new())
+            {
+                using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
                 {
-                    using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        csEncrypt.Write(bytes, 0, bytes.Length);
-                        csEncrypt.FlushFinalBlock();
-                        return msEncrypt.ToArray();
-                    }
+                    csEncrypt.Write(bytes, 0, bytes.Length); // encrypt data
+                    csEncrypt.FlushFinalBlock(); // finalize encryption process: last block, padding
+                    return msEncrypt.ToArray(); // store in an array of bytes
                 }
             }
+            
         }
 
-        public string AesDecryptBytes(byte[] cipherText, byte[] Key, byte[] IV)
+        public string AesDecryptBytes(byte[] cipherText)
         {
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException(nameof(cipherText));
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException(nameof(Key));
-            if (IV == null || IV.Length <= 0) throw new ArgumentNullException(nameof(IV));
             string decryption = null; 
 
-            using (Aes aesAlg = Aes.Create())
+            ICryptoTransform decryptor = AesAlg.CreateDecryptor(AesAlg.Key, AesAlg.IV);
+
+            using (MemoryStream msDecrypt = new(cipherText))
             {
-                aesAlg.Key = AesAlg.Key;
-                aesAlg.IV = AesAlg.IV;
-
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msDecrypt = new(cipherText))
+                using (CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read))
                 {
-                    using (CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    using (StreamReader swDecrypt = new(csDecrypt))
                     {
-                        using (StreamReader swDecrypt = new(csDecrypt))
-                        {
-                            decryption = swDecrypt.ReadToEnd();
-                        }
+                        decryption = swDecrypt.ReadToEnd();
                     }
                 }
             }
+            
             return decryption;
         }
 
-        
+        public static void ChangeAesKey(byte[] key, byte[] iv)
+        {
+            AesAlg.Key = key;
+            AesAlg.IV = iv;
+        }
     }
 }

@@ -9,6 +9,6 @@ namespace SecureNotes.IServices
     public interface IEncryptDecryptService
     {
         public byte[] AesEncryptBytes(byte[] bytes);
-        public string AesDecryptBytes(byte[] cipherText, byte[] Key, byte[] IV);
+        public string AesDecryptBytes(byte[] cipherText);
     }
 }

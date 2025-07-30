@@ -59,23 +59,19 @@ namespace SecureNotes.ViewModels
             bool? success = txtSelection.ShowDialog();
             if (success == true)
             {
-                // Get the file path
+                
                 string filePath = txtSelection.FileName;
-                // Read the file using the file path and the file service. Store the data as
-                // bytes.
-                TestOutput = filePath;
-                byte[] txtData = _fileService.ReadTxtFile(filePath);
-                string strTxtData = Convert.ToBase64String(txtData); // test
-                TestOutput = strTxtData;
-                // AES Encrypt those bytes using the bytes and the encrypt-decrypt service.
+                //TestOutput = filePath; // test
+                byte[] txtData = _fileService.ReadTxtFileAsBytes(filePath);
+                //string strTxtData = Convert.ToBase64String(txtData); // test
+                //TestOutput = strTxtData;
                 byte[] cipherTextByte = _encryptDecryptService.AesEncryptBytes(txtData);
                 // Convert binary encryption into readable text so that it can be readable 
                 // in a text file. (ChatGPT)
-                string strCipher = Convert.ToBase64String(cipherTextByte); // test
-                TestOutput = strCipher;
-                // Use OpenFileDialog to select the specific path/dir to place the new txt file
+                string strCipher = Convert.ToBase64String(cipherTextByte);
+                TestOutput = strCipher; // test
                 OpenFileDialog dirSelection = new OpenFileDialog();
-                dirSelection.Filter = "Please Select The Directory For The .txt File | *.*";
+                dirSelection.Filter = "Please Select The Directory For The .txt File | *.txt*";
                 // Folder selection trick
                 dirSelection.CheckFileExists = false;
                 dirSelection.ValidateNames = false;
@@ -88,6 +84,7 @@ namespace SecureNotes.ViewModels
                     //_fileService.WriteBytesTxtFile(dirSelection.FileName, cipherTextByte);
                     _fileService.WriteStringTxtFile(dirSelection.FileName, strCipher);
                     // Write the AES key to txt using the file service and the key.
+                    
                 }
 
 
