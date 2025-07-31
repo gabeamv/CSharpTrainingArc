@@ -61,7 +61,7 @@ namespace SecureNotes.ViewModels
             {
                 
                 string filePath = txtSelection.FileName;
-                //TestOutput = filePath; // test
+                TestOutput = filePath; // test
                 byte[] txtData = _fileService.ReadTxtFileAsBytes(filePath);
                 //string strTxtData = Convert.ToBase64String(txtData); // test
                 //TestOutput = strTxtData;

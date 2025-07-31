@@ -14,8 +14,8 @@ namespace SecureNotes.Services
     {
         // Static aes algorithm that persists throughout the lifetime of the application.
         public static Aes AesAlg { get; private set; } = Aes.Create();
-        public EncryptDecryptService() { 
-
+        public EncryptDecryptService() {
+            //AesAlg.Padding = PaddingMode.None;
         }
 
         public byte[] AesEncryptBytes(byte[] bytes)
@@ -44,6 +44,7 @@ namespace SecureNotes.Services
                 throw new ArgumentNullException(nameof(cipherText));
             string decryption = null; 
 
+            
             ICryptoTransform decryptor = AesAlg.CreateDecryptor(AesAlg.Key, AesAlg.IV);
 
             using (MemoryStream msDecrypt = new(cipherText))
@@ -56,14 +57,16 @@ namespace SecureNotes.Services
                     }
                 }
             }
-            
+ 
             return decryption;
         }
 
-        public static void ChangeAesKey(byte[] key, byte[] iv)
+        public static void ChangeAesKey(byte[] key = null, byte[] iv = null, PaddingMode mode = PaddingMode.None)
         {
-            AesAlg.Key = key;
-            AesAlg.IV = iv;
+
+            if (key != null) AesAlg.Key = key;
+            if (iv != null) AesAlg.IV = iv;
+            if (mode != PaddingMode.None) AesAlg.Padding = mode;
         }
     }
 }

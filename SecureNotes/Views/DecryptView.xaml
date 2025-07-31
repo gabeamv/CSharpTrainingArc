@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SecureNotes.Views"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="White">
@@ -12,6 +13,7 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        
         <StackPanel Grid.Row="0">
             <TextBlock Grid.Row="0" x:Name="Title" Text="Decrypt View" FontSize="32" HorizontalAlignment="Center"/>
             <Button x:Name="HomeButton" Content="Go Home" FontSize="16" Command="{Binding NavigateHome}" 
@@ -21,8 +23,12 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Content="Decrypt File" Command="{Binding DecryptFile}"/>
         </StackPanel>
-        <TextBlock Grid.Row="2" x:Name="Testing" Text="{Binding TestOutput}" HorizontalAlignment="Center" 
-            VerticalAlignment="Center" FontSize="24"/>
+        
+        <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="Testing" Text="{Binding TestOutput}" HorizontalAlignment="Center" 
+             VerticalAlignment="Center" FontSize="24"/>
+        </StackPanel>
+        
 
     </Grid>
 </UserControl>
