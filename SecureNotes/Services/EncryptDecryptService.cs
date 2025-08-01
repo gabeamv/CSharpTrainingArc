@@ -15,7 +15,8 @@ namespace SecureNotes.Services
         // Static aes algorithm that persists throughout the lifetime of the application.
         public static Aes AesAlg { get; private set; } = Aes.Create();
         public EncryptDecryptService() {
-            //AesAlg.Padding = PaddingMode.None;
+            // AesAlg.Padding = PaddingMode.None;
+            
         }
 
         public byte[] AesEncryptBytes(byte[] bytes)
@@ -67,6 +68,11 @@ namespace SecureNotes.Services
             if (key != null) AesAlg.Key = key;
             if (iv != null) AesAlg.IV = iv;
             if (mode != PaddingMode.None) AesAlg.Padding = mode;
+        }
+
+        public static string GetKeyIV()
+        {
+            return $"{Convert.ToBase64String(AesAlg.Key)},{Convert.ToBase64String(AesAlg.IV)}";
         }
     }
 }

@@ -7,7 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="1"  Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Button Margin="0, 0, 50, 0" Width="100" Height="100" Command="{Binding NavigateEncryptFile}">
                 <Image Source="/Assets/Images/lock.png"/>
             </Button>
@@ -15,5 +20,6 @@
                 <Image Source="/Assets/Images/key.png"/>
             </Button>
         </StackPanel>
+        <Button Grid.Row="2" Content="Export Key and IV" Command="{Binding ExportKey}" Height="30" Width="100"/>
     </Grid>
 </UserControl>

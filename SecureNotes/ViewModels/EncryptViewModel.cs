@@ -52,7 +52,7 @@ namespace SecureNotes.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public void Encrypt()
+        private void Encrypt()
         {
             OpenFileDialog txtSelection = new OpenFileDialog();
             txtSelection.Filter = "Please Select A .txt File (*.txt) | *.txt";

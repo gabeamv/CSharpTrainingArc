@@ -67,8 +67,8 @@ namespace SecureNotes.ViewModels
                     
                     string filePath = txtSelection.FileName;
                     //TestOutput = filePath; // test
-                    string base64Encryption = _fileService.ReadTxtFileAsString(filePath);
-                    byte[] cipherText = Convert.FromBase64String(base64Encryption); // test
+                    string base64 = _fileService.ReadTxtFileAsString(filePath);
+                    byte[] cipherText = Convert.FromBase64String(base64); // test
                                                                                     //TestOutput = strTxtData;
                     string plainTextStr = _encryptDecryptService.AesDecryptBytes(cipherText);
                     OpenFileDialog dirSelection = new OpenFileDialog();
