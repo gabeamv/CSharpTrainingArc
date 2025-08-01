@@ -18,40 +18,25 @@ namespace SecureNotes.ViewModels
     {
         private FileService _fileService = new FileService();
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
-        private string _testOutput;
-        public string TestOutput
+
+        private string _feedbackMessage;
+        public string FeedbackMessage
         {
-            get { return _testOutput; }
-            set
-            {
-                _testOutput = value;
+            get { return _feedbackMessage; }
+            set { 
+                _feedbackMessage = value;
                 OnPropertyChanged();
             }
         }
         public DecryptViewModel(NavigationService navService)
         {
-            System.Diagnostics.Debug.WriteLine("Constructor instance: " + this.GetHashCode());
             NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService)));
             DecryptFile = new RelayCommand(() => this.Decrypt());
-            _testOutput = EncryptDecryptService.AesAlg.Padding.ToString();
         }
 
-       
-        private string _fileDialogSuccess;
 
         public ICommand NavigateHome { get; }
         public ICommand DecryptFile { get; }
-        public string FileDialogSuccess
-        {
-            get { return _fileDialogSuccess; }
-            set
-            {
-                {
-                    _fileDialogSuccess = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -66,14 +51,13 @@ namespace SecureNotes.ViewModels
                 {
                     
                     string filePath = txtSelection.FileName;
-                    //TestOutput = filePath; // test
+
                     string base64 = _fileService.ReadTxtFileAsString(filePath);
-                    byte[] cipherText = Convert.FromBase64String(base64); // test
-                                                                                    //TestOutput = strTxtData;
+                    byte[] cipherText = Convert.FromBase64String(base64); 
+                                                                                   
                     string plainTextStr = _encryptDecryptService.AesDecryptBytes(cipherText);
                     OpenFileDialog dirSelection = new OpenFileDialog();
                     dirSelection.Filter = "Please Select The Directory | *.txt";
-                    // Folder selection trick
                     dirSelection.CheckFileExists = false;
                     dirSelection.ValidateNames = false;
                     dirSelection.Multiselect = false;
@@ -81,27 +65,24 @@ namespace SecureNotes.ViewModels
                     success = dirSelection.ShowDialog();
                     if (success == true)
                     {
-                        // Output/write the encrypted data to txt using the file service and the encrypted bytes
-                        //_fileService.WriteBytesTxtFile(dirSelection.FileName, cipherTextByte);
                         _fileService.WriteStringTxtFile(dirSelection.FileName, plainTextStr);
                         // Write the AES key to txt using the file service and the key.
-                        TestOutput = "Decryption Success";
+                        FeedbackMessage = "Decryption Success!";
                     }
                 }
                 catch (FormatException e)
                 {
-                    TestOutput = "Invalid File. Base64 format required.";
+                    FeedbackMessage = "Invalid File. Base64 format required.";
                 }
                 catch (CryptographicException e)
                 {
-                    TestOutput = "Decryption Failed.";
+                    FeedbackMessage = "Decryption Failed.";
                 }
-
 
             }
             else
             {
-                TestOutput = "No File Path";
+                FeedbackMessage = "No File Path";
             }
         }
 

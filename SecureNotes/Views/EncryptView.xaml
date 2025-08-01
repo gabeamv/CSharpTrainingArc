@@ -21,7 +21,7 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Content="Encrypt File" Command="{Binding EncryptFile}"/>
         </StackPanel>
-        <TextBlock Grid.Row="2" x:Name="Testing" Text="{Binding TestOutput}" HorizontalAlignment="Center" 
+        <TextBlock Grid.Row="2" x:Name="Testing" Text="{Binding FeedbackMessage}" HorizontalAlignment="Center" 
            VerticalAlignment="Center" FontSize="24"/>
     </Grid>
 </UserControl>

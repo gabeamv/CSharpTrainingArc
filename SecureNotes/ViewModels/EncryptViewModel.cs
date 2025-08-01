@@ -21,34 +21,22 @@ namespace SecureNotes.ViewModels
         {
             NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService)));
             EncryptFile = new RelayCommand(() => Encrypt());
-            TestOutput = "Testing";
         }
 
-        private string _testOutput;
-        public string TestOutput
+        private string _feedbackMessage;
+        public string FeedbackMessage
         {
-            get { return _testOutput; }
-            set { 
-                _testOutput = value;
+            get { return _feedbackMessage; }
+            set
+            {
+                _feedbackMessage = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _fileDialogSuccess;
-
         public ICommand NavigateHome { get; }
         public ICommand EncryptFile { get; }
-        public string FileDialogSuccess 
-        { 
-            get { return _fileDialogSuccess; }
-            set
-            {
-                {  
-                    _fileDialogSuccess = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -59,20 +47,13 @@ namespace SecureNotes.ViewModels
             bool? success = txtSelection.ShowDialog();
             if (success == true)
             {
-                
                 string filePath = txtSelection.FileName;
-                TestOutput = filePath; // test
                 byte[] txtData = _fileService.ReadTxtFileAsBytes(filePath);
-                //string strTxtData = Convert.ToBase64String(txtData); // test
-                //TestOutput = strTxtData;
                 byte[] cipherTextByte = _encryptDecryptService.AesEncryptBytes(txtData);
-                // Convert binary encryption into readable text so that it can be readable 
-                // in a text file. (ChatGPT)
                 string strCipher = Convert.ToBase64String(cipherTextByte);
-                TestOutput = strCipher; // test
+
                 OpenFileDialog dirSelection = new OpenFileDialog();
                 dirSelection.Filter = "Please Select The Directory For The .txt File | *.txt*";
-                // Folder selection trick
                 dirSelection.CheckFileExists = false;
                 dirSelection.ValidateNames = false;
                 dirSelection.Multiselect = false;
@@ -80,18 +61,14 @@ namespace SecureNotes.ViewModels
                 success = dirSelection.ShowDialog();
                 if (success == true)
                 {
-                    // Output/write the encrypted data to txt using the file service and the encrypted bytes
-                    //_fileService.WriteBytesTxtFile(dirSelection.FileName, cipherTextByte);
                     _fileService.WriteStringTxtFile(dirSelection.FileName, strCipher);
-                    // Write the AES key to txt using the file service and the key.
-                    
+                    FeedbackMessage = "Encryption Success!";
                 }
-
 
             }
             else
             {
-                TestOutput = "No File Path";
+                FeedbackMessage = "No File Path";
             }
         }
 

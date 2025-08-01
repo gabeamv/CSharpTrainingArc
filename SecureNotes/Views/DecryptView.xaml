@@ -25,7 +25,7 @@
         </StackPanel>
         
         <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock x:Name="Testing" Text="{Binding TestOutput}" HorizontalAlignment="Center" 
+            <TextBlock x:Name="Testing" Text="{Binding FeedbackMessage}" HorizontalAlignment="Center" 
              VerticalAlignment="Center" FontSize="24"/>
         </StackPanel>
         
