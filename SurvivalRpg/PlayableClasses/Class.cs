@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SurvivalRpg.PlayableClasses
 {
-    internal interface IRogue
+    public abstract class Class
     {
+
     }
 }
