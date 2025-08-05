@@ -1,6 +1,8 @@
 ﻿using SurvivalRpg.Entities;
 using SurvivalRpg.PlayableClasses;
 using SurvivalRpg.Services;
+using SurvivalRpg.Utility;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace SurvivalRpg
@@ -9,31 +11,66 @@ namespace SurvivalRpg
     {
         static void Main(string[] args)
         {
-            List<Entity> entities = new List<Entity>();
+            List<Entity> entities = new List<Entity>(); // list of entities.
             MapService.Coord playerCoords = new MapService.Coord(0,0);
-            MapService userMap = new MapService(entities, ref playerCoords);
-            Player user = new Player(userMap, playerCoords);
+            MapService mapService = new MapService(entities, ref playerCoords);
+            Player user = new Warrior(mapService, playerCoords);
 
-            while (true)
+            while (true) // game loop
             {
-                Console.WriteLine(user.Map.MapSeen());
-                Console.WriteLine("1. North\n2. South\n3. East\n 4. West");
-                string direction = Console.ReadLine();
-                int dir;
-                if (int.TryParse(direction, out dir))
+                user.Map.DisplayMapSeen();
+                user.Map.DisplayMap();
+                Console.WriteLine("W. North\nS. South\nD. East\nA. West");
+                string strDir = Console.ReadLine();
+                while (strDir.ToUpper() != MapUtility.NORTH && strDir.ToUpper() != MapUtility.SOUTH && 
+                    strDir.ToUpper() != MapUtility.EAST && strDir.ToUpper() != MapUtility.WEST)
                 {
-                    if (dir == 1) userMap.GoNorth();
-                    if (dir == 2) userMap.GoSouth();
-                    if (dir == 3) userMap.GoEast();
-                    if (dir == 4) userMap.GoWest();
+                    Console.WriteLine("Please Enter Valid Input:\nW. North\nS. South\nD. East\n . West");
+                    strDir = Console.ReadLine();
                 }
+
+                try
+                {
+                    switch (strDir.ToUpper())
+                    {
+                        case MapUtility.NORTH:
+                            user.Map.GoNorth();
+                            break;
+                        case MapUtility.SOUTH:
+                            user.Map.GoSouth();
+                            break;
+                        case MapUtility.EAST:
+                            user.Map.GoEast();
+                            break;
+                        case MapUtility.WEST:
+                            user.Map.GoWest();
+                            break;
+                        default: break;
+                    }
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                    Console.WriteLine("Cannot Go There!");
+                }
+                
+              
+                switch (user.Map.GetEvent())
+                {
+                    case MapUtility.MapSymbol.ENCOUNTER:
+                        // Encounter
+                        break;
+                    case MapUtility.MapSymbol.CONSUMABLE:
+                        // give consumable item.
+                        break;
+                    case MapUtility.MapSymbol.DUNGEON_MAP:
+                        // reveal the entire dungeon. 
+                    default: break; // Do nothing
+                }
+
+                
             }
         }
 
-        public void GetDirection()
-        {
-
-        }
     }
 
 }

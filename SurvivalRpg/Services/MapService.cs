@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 
 namespace SurvivalRpg.Services
 {
-
     // Service to represent and store positions of entities on the map.
     public class MapService
     {
         private static Random random = new Random();
-
+        public const int MAX_DIM_INDEX = 9;
+        public const int MIN_DIM_INDEX = 0;
+        public const int MAP_SIZE = 100;
         // Structure to represent coordinates in map.
         public struct Coord
         {
@@ -30,8 +31,8 @@ namespace SurvivalRpg.Services
 
         }
 
-        public bool[,] Seen { get; set; } = new bool[10, 10];
-        public char[,] Map { get; set; } = new char[10, 10];
+        public bool[,] Seen { get; set; } = new bool[MAX_DIM_INDEX + 1, MAX_DIM_INDEX + 1];
+        public MapUtility.MapSymbol[,] Map { get; set; } = new MapUtility.MapSymbol[MAX_DIM_INDEX + 1, MAX_DIM_INDEX + 1];
         private List<Entity> EntityCoord;
         private Coord PlayerCoord;
 
@@ -40,6 +41,7 @@ namespace SurvivalRpg.Services
             EntityCoord = entityCoord;
             PlayerCoord = playerCoord;
             Seen[PlayerCoord.X, PlayerCoord.Y] = true;
+            GenerateMap();
         }
 
         public string MapSeen()
@@ -49,33 +51,134 @@ namespace SurvivalRpg.Services
             {
                 for (int x = 0; x < Seen.GetLength(1); x++)
                 {
-                    if (!Seen[x, y]) seenMap.Append(Util.NOT_SEEN + "  ");
-                    else if (PlayerCoord.X == x && PlayerCoord.Y == y) seenMap.Append(Util.PLAYER + "  ");
-                    else seenMap.Append(Util.SEEN + "  ");
+                    if (!Seen[x, y]) seenMap.Append((char)MapUtility.MapSymbol.NOT_SEEN + "  ");
+                    else if (PlayerCoord.X == x && PlayerCoord.Y == y) seenMap.Append((char)MapUtility.MapSymbol.PLAYER + "  ");
+                    else if (Seen[x, y] && Map[x, y] == MapUtility.MapSymbol.NOT_SEEN) seenMap.Append((char)MapUtility.MapSymbol.SEEN + "  ");
+                    else seenMap.Append((char)Map[x, y] + "  ");
                     if (x == Seen.GetLength(1) - 1) seenMap.Append("\n");
                 }
             }
             return seenMap.ToString();
         }
 
+        public string FullMap()
+        {
+            StringBuilder fullMap = new StringBuilder();
+            for (int y = 0; y < Map.GetLength(0); y++)
+            {
+                for (int x = 0; x < Map.GetLength(1); x++)
+                {
+                    fullMap.Append(((char)Map[x, y]).ToString() + "  ");
+                    if (x == MAX_DIM_INDEX) fullMap.Append("\n");
+                }
+            }
+            return fullMap.ToString();
+        }
+
         public void GoNorth()
         {
+            if (PlayerCoord.Y - 1 < 0) throw new IndexOutOfRangeException();
             Seen[PlayerCoord.X, --PlayerCoord.Y] = true;
         }
 
         public void GoSouth()
         {
+            if (PlayerCoord.Y + 1 > MAX_DIM_INDEX) throw new IndexOutOfRangeException();
             Seen[PlayerCoord.X, ++PlayerCoord.Y] = true;
         }
 
         public void GoEast()
         {
+            if (PlayerCoord.X + 1 > MAX_DIM_INDEX) throw new IndexOutOfRangeException();
             Seen[++PlayerCoord.X, PlayerCoord.Y] = true;
         }
 
         public void GoWest()
         {
+            if (PlayerCoord.X - 1 < 0) throw new IndexOutOfRangeException();
             Seen[--PlayerCoord.X, PlayerCoord.Y] = true;
+        }
+
+        public void DisplayMapSeen()
+        {
+            Console.WriteLine(MapSeen());
+        }
+
+        public void DisplayMap()
+        {
+            Console.WriteLine(FullMap());
+        }
+
+        public MapUtility.MapSymbol GetEvent()
+        {
+            return Map[PlayerCoord.X, PlayerCoord.Y];
+        }
+
+        private void GenerateMap()
+        {
+            int ENCOUNTER_INSTANCES = 20;
+            int CONSUMABLE_INSTANCES = 10;
+            int ENTRANCE_INSTANCES = 2;
+            int DUNGEON_MAP_INSTANCES = 1;
+            int NOT_SEEN_INSTANCES = MAP_SIZE - ENCOUNTER_INSTANCES - CONSUMABLE_INSTANCES - ENTRANCE_INSTANCES
+                - DUNGEON_MAP_INSTANCES;
+
+            // Create a List<(int, int)> to store coordinates 0,0 to 9,9
+            List<(int x, int y)> coords = new List<(int x, int y)>();
+            for (int i = 0; i < MAX_DIM_INDEX + 1; i++)
+            {
+                for (int j = 0; j < MAX_DIM_INDEX + 1; j++)
+                {
+                    coords.Add((i, j));
+                }
+            }
+
+            // Get a randomly chosen point from the first and last columns of the map
+            int s1Row = random.Next(0, MAX_DIM_INDEX + 1);
+            int s1Col = MIN_DIM_INDEX;
+            int s2Row = random.Next(0, MAX_DIM_INDEX + 1);
+            int s2Col = MAX_DIM_INDEX;
+
+            // Set s1.
+            for (int i = 0; i < coords.Count; i++) 
+            {
+                if (coords[i] == (s1Row, s1Col))
+                {
+                    Map[s1Row, s1Col] = MapUtility.MapSymbol.ENTRANCE;
+                    coords.RemoveAt(i);
+                    break;
+                }
+            }
+
+            // Set s2.
+            for (int i = 0; i < coords.Count; i++)
+            {
+                if (coords[i] == (s2Row, s2Col))
+                {
+                    Map[s2Row, s2Col] = MapUtility.MapSymbol.ENTRANCE;
+                    coords.RemoveAt(i);
+                    break;
+                }
+            }
+            SetMapSymbolCoord(coords, NOT_SEEN_INSTANCES, MapUtility.MapSymbol.NOT_SEEN);
+            SetMapSymbolCoord(coords, DUNGEON_MAP_INSTANCES, MapUtility.MapSymbol.DUNGEON_MAP);
+            SetMapSymbolCoord(coords, ENCOUNTER_INSTANCES, MapUtility.MapSymbol.ENCOUNTER);
+            SetMapSymbolCoord(coords, CONSUMABLE_INSTANCES, MapUtility.MapSymbol.CONSUMABLE);
+            
+        }
+
+        private void SetMapSymbolCoord(List<(int, int)> coords, int numInstances, 
+            MapUtility.MapSymbol symbol)
+        {
+            for (int i = 0; i < numInstances; i++) // get n instances of randomly chosen coords
+            {
+                int randIdx = random.Next(0, coords.Count);
+                (int x, int y) randCoord = coords[randIdx];
+                coords.RemoveAt(randIdx);
+                Map[randCoord.x, randCoord.y] = symbol;
+                
+                
+            }
         }
     }
 }

@@ -12,5 +12,6 @@ namespace SurvivalRpg.IPlayableClasses
         public static double Health_X = 1.5;
         public static double Resistance_X = 2;
         public static double Crit_X = 1;
+
     }
 }

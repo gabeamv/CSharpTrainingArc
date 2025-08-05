@@ -13,4 +13,8 @@
     <None Remove="Weapons\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Items\" />
+  </ItemGroup>
+
 </Project>
