@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SurvivalRpg.Enemies
+namespace SurvivalRpg.Breeds
 {
-    internal class Thug
+    public class Goblin
     {
+
     }
 }
