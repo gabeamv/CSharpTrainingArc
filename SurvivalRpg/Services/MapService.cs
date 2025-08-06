@@ -33,15 +33,11 @@ namespace SurvivalRpg.Services
 
         public bool[,] Seen { get; set; } = new bool[MAX_DIM_INDEX + 1, MAX_DIM_INDEX + 1];
         public MapUtility.MapSymbol[,] Map { get; set; } = new MapUtility.MapSymbol[MAX_DIM_INDEX + 1, MAX_DIM_INDEX + 1];
-        private List<Entity> EntityCoord;
-        private Coord PlayerCoord;
+        public Coord PlayerCoord;
 
-        public MapService(List<Entity> entityCoord, ref Coord playerCoord)
+        public MapService()
         {
-            EntityCoord = entityCoord;
-            PlayerCoord = playerCoord;
-            Seen[PlayerCoord.X, PlayerCoord.Y] = true;
-            GenerateMap();
+            GenerateMap(); // Initializes PlayerCoord
         }
 
         public string MapSeen()
@@ -51,10 +47,10 @@ namespace SurvivalRpg.Services
             {
                 for (int x = 0; x < Seen.GetLength(1); x++)
                 {
-                    if (!Seen[x, y]) seenMap.Append((char)MapUtility.MapSymbol.NOT_SEEN + "  ");
-                    else if (PlayerCoord.X == x && PlayerCoord.Y == y) seenMap.Append((char)MapUtility.MapSymbol.PLAYER + "  ");
-                    else if (Seen[x, y] && Map[x, y] == MapUtility.MapSymbol.NOT_SEEN) seenMap.Append((char)MapUtility.MapSymbol.SEEN + "  ");
-                    else seenMap.Append((char)Map[x, y] + "  ");
+                    if (!Seen[x, y]) seenMap.Append((char)MapUtility.MapSymbol.NOT_SEEN + "   ");
+                    else if (PlayerCoord.X == x && PlayerCoord.Y == y) seenMap.Append((char)MapUtility.MapSymbol.PLAYER + "   ");
+                    else if (Seen[x, y] && Map[x, y] == MapUtility.MapSymbol.NOT_SEEN) seenMap.Append((char)MapUtility.MapSymbol.SEEN + "   ");
+                    else seenMap.Append((char)Map[x, y] + "   ");
                     if (x == Seen.GetLength(1) - 1) seenMap.Append("\n");
                 }
             }
@@ -68,7 +64,7 @@ namespace SurvivalRpg.Services
             {
                 for (int x = 0; x < Map.GetLength(1); x++)
                 {
-                    fullMap.Append(((char)Map[x, y]).ToString() + "  ");
+                    fullMap.Append(((char)Map[x, y]).ToString() + "   ");
                     if (x == MAX_DIM_INDEX) fullMap.Append("\n");
                 }
             }
@@ -114,7 +110,7 @@ namespace SurvivalRpg.Services
             return Map[PlayerCoord.X, PlayerCoord.Y];
         }
 
-        private void GenerateMap()
+        public void GenerateMap()
         {
             int ENCOUNTER_INSTANCES = 20;
             int CONSUMABLE_INSTANCES = 10;
@@ -134,17 +130,20 @@ namespace SurvivalRpg.Services
             }
 
             // Get a randomly chosen point from the first and last columns of the map
-            int s1Row = random.Next(0, MAX_DIM_INDEX + 1);
-            int s1Col = MIN_DIM_INDEX;
-            int s2Row = random.Next(0, MAX_DIM_INDEX + 1);
-            int s2Col = MAX_DIM_INDEX;
+            int s1x = MIN_DIM_INDEX;
+            int s1y = random.Next(0, MAX_DIM_INDEX + 1);
+            // Randomly chosen start is the player's initial coordinates.
+            PlayerCoord.X = s1x;
+            PlayerCoord.Y = s1y;
+            int s2x = MAX_DIM_INDEX;
+            int s2y = random.Next(0, MAX_DIM_INDEX + 1);
 
             // Set s1.
             for (int i = 0; i < coords.Count; i++) 
             {
-                if (coords[i] == (s1Row, s1Col))
+                if (coords[i] == (s1x, s1y))
                 {
-                    Map[s1Row, s1Col] = MapUtility.MapSymbol.ENTRANCE;
+                    Map[s1x, s1y] = MapUtility.MapSymbol.ENTRANCE;
                     coords.RemoveAt(i);
                     break;
                 }
@@ -153,21 +152,30 @@ namespace SurvivalRpg.Services
             // Set s2.
             for (int i = 0; i < coords.Count; i++)
             {
-                if (coords[i] == (s2Row, s2Col))
+                if (coords[i] == (s2x, s2y))
                 {
-                    Map[s2Row, s2Col] = MapUtility.MapSymbol.ENTRANCE;
+                    Map[s2x, s2y] = MapUtility.MapSymbol.ENTRANCE;
                     coords.RemoveAt(i);
                     break;
                 }
             }
-            SetMapSymbolCoord(coords, NOT_SEEN_INSTANCES, MapUtility.MapSymbol.NOT_SEEN);
-            SetMapSymbolCoord(coords, DUNGEON_MAP_INSTANCES, MapUtility.MapSymbol.DUNGEON_MAP);
-            SetMapSymbolCoord(coords, ENCOUNTER_INSTANCES, MapUtility.MapSymbol.ENCOUNTER);
-            SetMapSymbolCoord(coords, CONSUMABLE_INSTANCES, MapUtility.MapSymbol.CONSUMABLE);
-            
+            SetSymbolAtCoord(coords, NOT_SEEN_INSTANCES, MapUtility.MapSymbol.NOT_SEEN);
+            SetSymbolAtCoord(coords, DUNGEON_MAP_INSTANCES, MapUtility.MapSymbol.DUNGEON_MAP);
+            SetSymbolAtCoord(coords, ENCOUNTER_INSTANCES, MapUtility.MapSymbol.ENCOUNTER);
+            SetSymbolAtCoord(coords, CONSUMABLE_INSTANCES, MapUtility.MapSymbol.CONSUMABLE);
+
+            for (int x = 0; x < MAX_DIM_INDEX + 1; x++)
+            {
+                for (int j = 0; j < MAX_DIM_INDEX + 1; j++)
+                {
+                    Seen[x, j] = false;
+                }
+            }
+            Seen[PlayerCoord.X, PlayerCoord.Y] = true;
         }
 
-        private void SetMapSymbolCoord(List<(int, int)> coords, int numInstances, 
+
+        private void SetSymbolAtCoord(List<(int, int)> coords, int numInstances, 
             MapUtility.MapSymbol symbol)
         {
             for (int i = 0; i < numInstances; i++) // get n instances of randomly chosen coords
@@ -176,9 +184,9 @@ namespace SurvivalRpg.Services
                 (int x, int y) randCoord = coords[randIdx];
                 coords.RemoveAt(randIdx);
                 Map[randCoord.x, randCoord.y] = symbol;
-                
-                
             }
         }
+
+        
     }
 }

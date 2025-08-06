@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace SurvivalRpg.Utility
 {
-
     public static class MapUtility
     {
         public enum MapSymbol
@@ -24,6 +23,5 @@ namespace SurvivalRpg.Utility
         public const string SOUTH = "S";
         public const string EAST = "D";
         public const string WEST = "A";
-
     }
 }

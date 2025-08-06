@@ -10,8 +10,11 @@ using static SurvivalRpg.Services.MapService;
 
 namespace SurvivalRpg.PlayableClasses
 {
-    public class Warrior : Player, IWarrior
+    public class Warrior : IWarrior
     {
-        public Warrior(MapService map, Coord coords) : base(map, coords) { }
+        public Warrior()
+        {
+
+        }
     }
 }

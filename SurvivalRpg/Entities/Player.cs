@@ -10,17 +10,18 @@ using System.Threading.Tasks;
 
 namespace SurvivalRpg.Entities
 {
-    public abstract class Player : Entity
+    public class Player : Entity
     {
-        public override int Health { get; set; } = 50;
-        public override int MaxHealth { get; set; } = 50;
+        public override int Health { get; set; }
+        public override int MaxHealth { get; set; }
         public MapService Map { get; private set; }
-        public MapService.Coord PlayerCoords { get; private set; }
-        
-        public Player(MapService map, MapService.Coord playerCoords)
+
+        private PlayerClass _PlayerClass { get; set; }
+
+        public Player(MapService map, PlayerClass playerClass)
         {
             Map = map;
-            PlayerCoords = playerCoords;
+            _PlayerClass = playerClass;
         }
 
     }

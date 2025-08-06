@@ -1,4 +1,5 @@
 ﻿using SurvivalRpg.Entities;
+using SurvivalRpg.Game;
 using SurvivalRpg.PlayableClasses;
 using SurvivalRpg.Services;
 using SurvivalRpg.Utility;
@@ -13,13 +14,13 @@ namespace SurvivalRpg
         {
             List<Entity> entities = new List<Entity>(); // list of entities.
             MapService.Coord playerCoords = new MapService.Coord(0,0);
-            MapService mapService = new MapService(entities, ref playerCoords);
-            Player user = new Warrior(mapService, playerCoords);
+            
+            Player user = new Warrior(new MapService());
 
             while (true) // game loop
             {
                 user.Map.DisplayMapSeen();
-                user.Map.DisplayMap();
+                //user.Map.DisplayMap();
                 Console.WriteLine("W. North\nS. South\nD. East\nA. West");
                 string strDir = Console.ReadLine();
                 while (strDir.ToUpper() != MapUtility.NORTH && strDir.ToUpper() != MapUtility.SOUTH && 
@@ -58,12 +59,21 @@ namespace SurvivalRpg
                 {
                     case MapUtility.MapSymbol.ENCOUNTER:
                         // Encounter
+                        Console.WriteLine("You have encountered a monster.");
+                        Encounter encounter = new Encounter(user, new Enemy());
                         break;
                     case MapUtility.MapSymbol.CONSUMABLE:
                         // give consumable item.
+                        Console.WriteLine("You found an item.");
                         break;
                     case MapUtility.MapSymbol.DUNGEON_MAP:
-                        // reveal the entire dungeon. 
+                        Console.WriteLine("You found a dungeon map.");
+                        break;
+                    case MapUtility.MapSymbol.ENTRANCE:
+                        Console.WriteLine("Entering new area...");
+                        user.Map.GenerateMap();
+                        break;
+                    // reveal the entire dungeon. 
                     default: break; // Do nothing
                 }
 
