@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SurvivalRpg.Enemies
+namespace SurvivalRpg.Breeds
 {
-    internal class Zombies
+    public class Thug
     {
     }
 }

@@ -3,6 +3,7 @@ using SurvivalRpg.Game;
 using SurvivalRpg.PlayableClasses;
 using SurvivalRpg.Services;
 using SurvivalRpg.Utility;
+using SurvivalRpg.Breeds;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -14,10 +15,13 @@ namespace SurvivalRpg
         {
             List<Entity> entities = new List<Entity>(); // list of entities.
             MapService.Coord playerCoords = new MapService.Coord(0,0);
-            
-            Player user = new Warrior(new MapService());
 
-            while (true) // game loop
+            Warrior warriorClass = new Warrior();
+            Breed zombieBreed = new Zombie();
+
+            Player user = warriorClass.NewPlayer();
+
+            while (user.IsAlive()) // game loop
             {
                 user.Map.DisplayMapSeen();
                 //user.Map.DisplayMap();
@@ -59,21 +63,24 @@ namespace SurvivalRpg
                 {
                     case MapUtility.MapSymbol.ENCOUNTER:
                         // Encounter
-                        Console.WriteLine("You have encountered a monster.");
-                        Encounter encounter = new Encounter(user, new Enemy());
+                        Console.WriteLine("You have encountered a zombie.");
+                        Encounter encounter = new Encounter(user, zombieBreed.NewEnemy());
+                        encounter.Start();
+                        if (!user.IsAlive()) Console.WriteLine("You have died...");
+                        else Console.WriteLine("You have defeated the zombie.");
                         break;
                     case MapUtility.MapSymbol.CONSUMABLE:
                         // give consumable item.
                         Console.WriteLine("You found an item.");
                         break;
                     case MapUtility.MapSymbol.DUNGEON_MAP:
+                        // reveal the entire dungeon. 
                         Console.WriteLine("You found a dungeon map.");
                         break;
                     case MapUtility.MapSymbol.ENTRANCE:
                         Console.WriteLine("Entering new area...");
                         user.Map.GenerateMap();
                         break;
-                    // reveal the entire dungeon. 
                     default: break; // Do nothing
                 }
 
