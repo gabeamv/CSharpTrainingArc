@@ -63,7 +63,7 @@ namespace SurvivalRpg.Game
             Console.WriteLine("Choose a move:\n1. Punch\n2. Kick\n3. Special One\n4. Special 2");
             string userInput = Console.ReadLine();
             int moveNum;
-            while(!int.TryParse(userInput, out moveNum) && moveNum < 1 && moveNum > 4)
+            while(!int.TryParse(userInput, out moveNum) || moveNum < 1 || moveNum > 4)
             {
                 Console.WriteLine("Please choose a valid move:\n1. Punch\n2. Kick\n3. Special One\n4. Special 2");
                 userInput = Console.ReadLine();
