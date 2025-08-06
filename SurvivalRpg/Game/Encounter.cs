@@ -1,4 +1,5 @@
 ﻿using SurvivalRpg.Entities;
+using SurvivalRpg.PlayableClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace SurvivalRpg.Game
         {
             _user = user;
             _enemy = enemy;
+
         }
     }
 }

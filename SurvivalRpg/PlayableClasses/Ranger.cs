@@ -9,9 +9,9 @@ using SurvivalRpg.Services;
 
 namespace SurvivalRpg.PlayableClasses
 {
-    public class Ranger : Player, IRanger
+    public class Ranger : IRanger
     {
-        public Ranger(MapService map, MapService.Coord coord) : base(map, coord)
+        public Ranger()
         {
 
         }

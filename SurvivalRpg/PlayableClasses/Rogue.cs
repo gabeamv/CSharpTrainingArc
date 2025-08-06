@@ -9,9 +9,12 @@ using SurvivalRpg.Services;
 
 namespace SurvivalRpg.PlayableClasses
 {
-    internal class Rogue : Player, IRogue
+    internal class Rogue : IRogue
     {
-        public Rogue(MapService map, MapService.Coord coord) : base(map, coord) { }
-        
+        public Rogue()
+        {
+
+
+        }
     }
 }
