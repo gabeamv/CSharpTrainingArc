@@ -25,24 +25,24 @@ namespace SurvivalRpg.Entities
             MaxHealth = playerClass.Health;
         }
 
-        public void Attack1(Entity entity)
+        public void Attack1(Enemy enemy)
         {
-            _Class.Attack1(entity);
+            _Class.Attack1(enemy);
         }
 
-        public void Attack2(Entity entity)
+        public void Attack2(Enemy enemy)
         {
-            _Class.Attack2(entity);
+            _Class.Attack2(enemy);
         }
 
-        public void Special1(Entity entity)
+        public void Special1(Enemy enemy)
         {
-            _Class.Special1(entity);
+            _Class.Special1(enemy);
         }
 
-        public void Special2(Entity entity)
+        public void Special2(Enemy enemy)
         {
-            _Class.Special2(entity);
+            _Class.Special2(enemy);
         }
 
         public override string ToString()

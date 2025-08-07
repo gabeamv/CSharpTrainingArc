@@ -19,14 +19,14 @@ namespace SurvivalRpg.Entities
             MaxHealth = breed.Health;
         }
 
-        public void Special1(Entity entity)
+        public void Special1(Player player)
         {
-            _Breed.Special1(entity);
+            _Breed.Special1(player);
         }
 
-        public void Special2(Entity entity)
+        public void Special2(Player player)
         {
-            _Breed.Special2(entity);
+            _Breed.Special2(player);
         }
 
         public override string ToString()

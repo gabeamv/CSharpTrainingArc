@@ -16,12 +16,12 @@ namespace SurvivalRpg.PlayableClasses
         public virtual void Attack1(Entity entity)
         {
             entity.TakeDamage(5);
-            Console.WriteLine($"{nameof(Class)} punched {nameof(entity)}");
+            Console.WriteLine($"{this} punched {entity.GetType()}");
         }
         public virtual void Attack2(Entity entity)
         {
             entity.TakeDamage(10);
-            Console.WriteLine($"{nameof(Class)} kicked {nameof(entity)}");
+            Console.WriteLine($"{this} kicked {entity.GetType()}");
         }
         public virtual void Special1(Entity entity) { return; }
         public virtual void Special2(Entity entity) { return; }
