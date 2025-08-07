@@ -31,7 +31,7 @@ namespace SurvivalRpg.Game
                         _user.Attack1(_enemy);
                         break;
                     case 2:
-                        _user.Attack2(_enemy);
+                        _user.Attack2(_enemy);   
                         break;
                     case 3:
                         _user.Special1(_enemy);

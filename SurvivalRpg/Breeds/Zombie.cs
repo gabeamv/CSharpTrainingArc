@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SurvivalRpg.Breeds
+namespace SurvivalRpg.Enemies
 {
     public class Zombie : Breed
     {
@@ -28,13 +28,13 @@ namespace SurvivalRpg.Breeds
         public override void Special1(Entity entity)
         {
             entity.TakeDamage(5);
-            Console.WriteLine($"{nameof(Zombie)} scratched {nameof(entity)}");
+            Console.WriteLine($"{this} scratched {entity.GetType()}");
         }
 
         public override void Special2(Entity entity)
         {
             entity.TakeDamage(15);
-            Console.WriteLine($"{nameof(Zombie)} bit {nameof(entity)}");
+            Console.WriteLine($"{this} bit {entity.GetType()}");
         }
     }
 }

@@ -6,6 +6,7 @@ using SurvivalRpg.Utility;
 using SurvivalRpg.Breeds;
 using System.Diagnostics;
 using System.Drawing;
+using SurvivalRpg.Enemies;
 
 namespace SurvivalRpg
 {

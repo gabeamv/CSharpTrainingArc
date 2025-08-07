@@ -32,13 +32,13 @@ namespace SurvivalRpg.PlayableClasses
         public override void Special1(Entity entity)
         {
             entity.TakeDamage(10);
-            Console.WriteLine($"{nameof(Class)} threw {nameof(entity)}.");
+            Console.WriteLine($"{this} threw {entity.GetType()}.");
         }
 
         public override void Special2(Entity entity)
         {
             entity.TakeDamage(15);
-            Console.WriteLine($"{nameof(Class)} stomped on {nameof(entity)}.");
+            Console.WriteLine($"{this} stomped on {entity.GetType()}.");
         }
     }
 }

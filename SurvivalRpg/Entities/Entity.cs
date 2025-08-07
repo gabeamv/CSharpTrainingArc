@@ -10,7 +10,6 @@ namespace SurvivalRpg.Entities
     {
         public abstract int Health { get; set; }
         public abstract int MaxHealth { get; set; }
-        
         public virtual void Heal(int healAmount)
         {
             Health += healAmount;
