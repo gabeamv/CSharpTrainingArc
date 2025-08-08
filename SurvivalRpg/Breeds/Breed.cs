@@ -13,8 +13,8 @@ namespace SurvivalRpg.Breeds
         public abstract double Health_X { get; set; }
         public abstract double Resistance_X { get; set; }
         public abstract double Crit_X { get; set; }
-        public abstract void Special1(Entity entity);
-        public abstract void Special2(Entity entity);
+        public abstract void Special1(Player player);
+        public abstract void Special2(Player player);
         public abstract Enemy NewEnemy();
     }
 }

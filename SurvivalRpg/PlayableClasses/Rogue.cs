@@ -20,16 +20,16 @@ namespace SurvivalRpg.PlayableClasses
 
         }
 
-        public override void Special1(Entity entity)
+        public override void Special1(Enemy enemy)
         {
-            entity.TakeDamage(20);
-            Console.WriteLine($"{nameof(Class)} stabbed {nameof(entity)}.");
+            enemy.TakeDamage(20);
+            Console.WriteLine($"{this} stabbed {enemy._Breed}.");
         }
 
-        public override void Special2(Entity entity)
+        public override void Special2(Enemy enemy)
         {
-            entity.TakeDamage(50);
-            Console.WriteLine($"{nameof(Class)} cut {nameof(entity)} up.");
+            enemy.TakeDamage(50);
+            Console.WriteLine($"{this} cut {enemy._Breed} up.");
         }
 
         public override Player NewPlayer()
