@@ -29,16 +29,16 @@ namespace SurvivalRpg.PlayableClasses
             return new Player(new MapService(), this);
         }
 
-        public override void Special1(Entity entity)
+        public override void Special1(Enemy enemy)
         {
-            entity.TakeDamage(10);
-            Console.WriteLine($"{this} threw {entity.GetType()}.");
+            enemy.TakeDamage(10);
+            Console.WriteLine($"{this} threw {enemy._Breed}.");
         }
 
-        public override void Special2(Entity entity)
+        public override void Special2(Enemy enemy)
         {
-            entity.TakeDamage(15);
-            Console.WriteLine($"{this} stomped on {entity.GetType()}.");
+            enemy.TakeDamage(15);
+            Console.WriteLine($"{this} stomped on {enemy._Breed}.");
         }
     }
 }

@@ -15,7 +15,7 @@ namespace SurvivalRpg.Entities
         public override int MaxHealth { get; set; }
         public MapService Map { get; private set; }
 
-        private Class _Class { get; set; }
+        public Class _Class { get; set; }
 
         public Player(MapService map, Class playerClass)
         {

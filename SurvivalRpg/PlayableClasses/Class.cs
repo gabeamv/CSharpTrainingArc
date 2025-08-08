@@ -13,18 +13,18 @@ namespace SurvivalRpg.PlayableClasses
         public abstract double Health_X { get; set; }
         public abstract double Resistance_X { get; set; }
         public abstract double Crit_X { get; set; }
-        public virtual void Attack1(Entity entity)
+        public virtual void Attack1(Enemy enemy)
         {
-            entity.TakeDamage(5);
-            Console.WriteLine($"{this} punched {entity.GetType()}");
+            enemy.TakeDamage(5);
+            Console.WriteLine($"{this} punched {enemy._Breed}");
         }
-        public virtual void Attack2(Entity entity)
+        public virtual void Attack2(Enemy enemy)
         {
-            entity.TakeDamage(10);
-            Console.WriteLine($"{this} kicked {entity.GetType()}");
+            enemy.TakeDamage(10);
+            Console.WriteLine($"{this} kicked {enemy._Breed}");
         }
-        public virtual void Special1(Entity entity) { return; }
-        public virtual void Special2(Entity entity) { return; }
+        public virtual void Special1(Enemy enemy) { return; }
+        public virtual void Special2(Enemy enemy) { return; }
 
         public abstract Player NewPlayer();
 

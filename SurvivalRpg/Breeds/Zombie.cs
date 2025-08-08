@@ -25,16 +25,16 @@ namespace SurvivalRpg.Enemies
             return new Enemy(this);
         }
 
-        public override void Special1(Entity entity)
+        public override void Special1(Player player)
         {
-            entity.TakeDamage(5);
-            Console.WriteLine($"{this} scratched {entity.GetType()}");
+            player.TakeDamage(5);
+            Console.WriteLine($"{this} scratched {player._Class}");
         }
 
-        public override void Special2(Entity entity)
+        public override void Special2(Player player)
         {
-            entity.TakeDamage(15);
-            Console.WriteLine($"{this} bit {entity.GetType()}");
+            player.TakeDamage(15);
+            Console.WriteLine($"{this} bit {player._Class}");
         }
     }
 }
