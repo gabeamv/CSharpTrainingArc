@@ -13,6 +13,7 @@ namespace SurvivalRpg.PlayableClasses
     public class Warrior : Class
     {
 
+        public override string Name { get; } = "Warrior";
         public override int Health { get; set; } = 75;
         public override double Health_X { get; set; } = 1.5;
         public override double Resistance_X { get; set; } = 2;
@@ -21,7 +22,7 @@ namespace SurvivalRpg.PlayableClasses
         // TODO: In the future, maybe implement a list of possible moves that a warrior can store, through config file.
         public Warrior() : base()
         {
-            
+
         }
 
         public override Player NewPlayer()
@@ -39,6 +40,11 @@ namespace SurvivalRpg.PlayableClasses
         {
             enemy.TakeDamage(15);
             Console.WriteLine($"{this} stomped on {enemy._Breed}.");
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }
