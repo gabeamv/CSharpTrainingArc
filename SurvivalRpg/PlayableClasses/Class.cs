@@ -9,6 +9,7 @@ namespace SurvivalRpg.PlayableClasses
 {
     public abstract class Class
     {
+        public abstract string Name { get; }
         public abstract int Health { get; set; }
         public abstract double Health_X { get; set; }
         public abstract double Resistance_X { get; set; }

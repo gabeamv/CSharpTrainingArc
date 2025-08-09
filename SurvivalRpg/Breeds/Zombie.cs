@@ -10,6 +10,7 @@ namespace SurvivalRpg.Enemies
 {
     public class Zombie : Breed
     {
+        public override string Name { get; } = "Zombie";
         public override int Health { get; set; } = 20;
         public override double Health_X { get; set; }
         public override double Resistance_X { get; set; }
@@ -19,7 +20,7 @@ namespace SurvivalRpg.Enemies
         {
 
         }
-        
+
         public override Enemy NewEnemy()
         {
             return new Enemy(this);
@@ -35,6 +36,10 @@ namespace SurvivalRpg.Enemies
         {
             player.TakeDamage(15);
             Console.WriteLine($"{this} bit {player._Class}");
+        }
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

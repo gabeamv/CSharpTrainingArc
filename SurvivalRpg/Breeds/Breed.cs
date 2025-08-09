@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ namespace SurvivalRpg.Breeds
 {
      public abstract class Breed
     {
+        public abstract string Name { get; }
         public abstract int Health { get; set; }
         public abstract double Health_X { get; set; }
         public abstract double Resistance_X { get; set; }
