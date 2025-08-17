@@ -1,0 +1,36 @@
+@SecureNotesWebApi_HostAddress = https://localhost:7042
+
+GET {{SecureNotesWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+
+
+POST {{SecureNotesWebApi_HostAddress}}/api/userauth/login
+Content-Type: application/json
+
+{
+  "username": "gabeamv",
+  "hashedPassword": "test123"
+}
+
+###
+
+POST {{SecureNotesWebApi_HostAddress}}/api/userauth/register
+Content-Type: application/json
+
+{
+  "username": "gabeamv",
+  "hashedPassword": "test123"
+}
+
+###
+
+POST {{SecureNotesWebApi_HostAddress}}/api/userauth/login
+Content-Type: application/json
+
+{
+  "username": "gabeamv",
+  "hashedPassword": "test123"
+}
+
+###
