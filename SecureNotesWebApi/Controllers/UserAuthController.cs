@@ -14,12 +14,18 @@ namespace SecureNotesWebApi.Controllers
             _context = context;
         }
 
+        [HttpGet("get")]
+        public IActionResult Get()
+        {
+            return Ok("API is working");
+        }
+
         // Method to register a new user.
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserAuth userAuth)
         {
-            var duplicateUser = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
-            if (duplicateUser != null)
+            var user = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
+            if (user != null)
             {
                 return Conflict($"There is already a user:\n{userAuth}");
             }

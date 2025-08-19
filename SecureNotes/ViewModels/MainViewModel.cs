@@ -28,10 +28,10 @@ namespace SecureNotes.ViewModels
 
         public MainViewModel()
         {
-            // Instantiate a new nav service that will pass in a lambda function to change the current viewmodel
-            // from the scope of feature viewmodels.
+            // Serivces
             var navService = new NavigationService(viewModel => CurrentViewModel = viewModel);
-            // Initial page will be the Authentication Page
+            var httpService = new HttpService();
+            
             CurrentViewModel = new AuthViewModel(navService);
         }
 
