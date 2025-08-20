@@ -82,10 +82,14 @@ namespace SecureNotes.ViewModels
         public AuthViewModel(NavigationService nav) {
             _nav = nav;
             LoginCommand = new RelayCommand(() => { 
-
-                // TODO: Make an http request to log in. If log in is successful, navigate to the home page.
-                _nav.NavigateTo(new HomeViewModel(_nav)); 
-
+                try
+                {
+                    _ = Login();
+                }
+                catch (HttpRequestException e)
+                {
+                    FeedbackMessage = e.Message;
+                }
             });
             RegisterCommand = new RelayCommand(() => { 
                 try
@@ -97,8 +101,6 @@ namespace SecureNotes.ViewModels
                     FeedbackMessage = e.Message;
                 }
             });
-            UsernameLabel = "Username";
-            PasswordLabel = "Password";
             FeedbackMessage = "This is for feedback.";
             UsernameText = "gabeamv";
             PasswordText = "Test123";
@@ -132,11 +134,6 @@ namespace SecureNotes.ViewModels
                 StringContent userJsonContent = new StringContent(userJson, Encoding.UTF8, "application/json");
                 try
                 {
-                    using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/register", userJsonContent);
-                    response.EnsureSuccessStatusCode();
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    FeedbackMessage = responseBody;
-
                     // Store private RSA key that corresponds to the now generated public key.
                     OpenFileDialog dirSelection = new OpenFileDialog();
                     dirSelection.CheckFileExists = false;
@@ -150,11 +147,38 @@ namespace SecureNotes.ViewModels
                         _fileService.WriteStringTxtFile(dirSelection.FileName, rsa.ExportPkcs8PrivateKeyPem());
                     }
 
+                    // Upload public key and other user info 
+                    using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/register", userJsonContent);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    FeedbackMessage = responseBody;
+
                 }
                 catch (HttpRequestException e)
                 {
                     FeedbackMessage = e.Message;
                 }
+            }
+            
+        }
+
+        private async Task Login()
+        {
+            UserAuth user = new UserAuth(UsernameText, PasswordText);
+            string userJson = JsonSerializer.Serialize(user);
+            StringContent userJsonContent = new StringContent(userJson, Encoding.UTF8, "application/json");
+            try
+            {
+                using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/login", userJsonContent);
+                response.EnsureSuccessStatusCode();
+                if (response.IsSuccessStatusCode)
+                {
+                    _nav.NavigateTo(new HomeViewModel(_nav));
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                FeedbackMessage = e.Message;
             }
             
         }
