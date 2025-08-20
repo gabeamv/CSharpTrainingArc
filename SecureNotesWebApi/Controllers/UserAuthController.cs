@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SecureNotesWebApi.Context;
 using SecureNotesWebApi.Models;
+using System.Text.Json;
 namespace SecureNotesWebApi.Controllers
 {
     [ApiController]
@@ -27,11 +28,11 @@ namespace SecureNotesWebApi.Controllers
             var user = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
             if (user != null)
             {
-                return Conflict($"There is already a user:\n{userAuth}");
+                return Conflict($"There is already a user:\n{userAuth.PublicKey}");
             }
             await _context.UserAuths.AddAsync(userAuth);
             await _context.SaveChangesAsync();
-            return Ok($"Successfully registered user:\n{userAuth}");
+            return Ok($"Successfully registered user:\n{userAuth.PublicKey}");
         }
 
         // Method to login a user.
@@ -40,8 +41,8 @@ namespace SecureNotesWebApi.Controllers
         {
             var user = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
             // TODO: Implement JWT
-            if (user != null && user.HashedPassword == userAuth.HashedPassword) return Ok($"Successfully logged in user:\n{userAuth}");
-            return NotFound($"There is no such user:\n{userAuth}.");
+            if (user != null && user.HashedPassword == userAuth.HashedPassword) return Ok($"Successfully logged in user:\n{JsonSerializer.Serialize(userAuth)}");
+            return NotFound($"There is no such user:\n{JsonSerializer.Serialize(userAuth)}.");
         }
 
         // Method to delete an account.

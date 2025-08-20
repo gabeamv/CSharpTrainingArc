@@ -1,4 +1,5 @@
-﻿using SecureNotes.Commands;
+﻿using Microsoft.Win32;
+using SecureNotes.Commands;
 using SecureNotes.Models;
 using SecureNotes.Services;
 using System;
@@ -7,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -24,6 +26,7 @@ namespace SecureNotes.ViewModels
         private string _passwordLabel;
         private string _feedbackMessage;
         private NavigationService _nav;
+        private FileService _fileService = new FileService();
         private HttpService _http;
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -121,20 +124,39 @@ namespace SecureNotes.ViewModels
 
         private async Task Register()
         {
-            UserAuth user = new UserAuth(UsernameText, PasswordText);
-            string userJson = JsonSerializer.Serialize(user);
-            StringContent userJsonContent = new StringContent(userJson, Encoding.UTF8, "application/json");
-            try
+            // magic no.
+            using (RSA rsa = RSA.Create(2048))
             {
-                using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/register", userJsonContent);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                FeedbackMessage = responseBody;
+                UserAuth user = new UserAuth(UsernameText, PasswordText, rsa.ExportSubjectPublicKeyInfoPem());
+                string userJson = JsonSerializer.Serialize(user);
+                StringContent userJsonContent = new StringContent(userJson, Encoding.UTF8, "application/json");
+                try
+                {
+                    using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/register", userJsonContent);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    FeedbackMessage = responseBody;
+
+                    // Store private RSA key that corresponds to the now generated public key.
+                    OpenFileDialog dirSelection = new OpenFileDialog();
+                    dirSelection.CheckFileExists = false;
+                    dirSelection.ValidateNames = false;
+                    dirSelection.Multiselect = false;
+                    dirSelection.FileName = $"{UsernameText}_private_key.txt";
+                    dirSelection.Filter = "Output Directory | *.txt";
+                    bool? success = dirSelection.ShowDialog();
+                    if (success ==  true)
+                    {
+                        _fileService.WriteStringTxtFile(dirSelection.FileName, rsa.ExportPkcs8PrivateKeyPem());
+                    }
+
+                }
+                catch (HttpRequestException e)
+                {
+                    FeedbackMessage = e.Message;
+                }
             }
-            catch (HttpRequestException e)
-            {
-                FeedbackMessage = e.Message;
-            }
+            
         }
     }
 }
