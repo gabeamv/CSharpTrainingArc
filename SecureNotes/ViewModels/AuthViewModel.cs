@@ -5,6 +5,7 @@ using SecureNotes.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -142,19 +143,27 @@ namespace SecureNotes.ViewModels
                     dirSelection.FileName = $"{UsernameText}_private_key.txt";
                     dirSelection.Filter = "Output Directory | *.txt";
                     bool? success = dirSelection.ShowDialog();
-                    if (success ==  true)
+                    if (success == true)
                     {
+                        // Upload public key and other user info 
+                        using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/register", userJsonContent);
+                        response.EnsureSuccessStatusCode();
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        FeedbackMessage = responseBody;
+                        // Write private key to file.
                         _fileService.WriteStringTxtFile(dirSelection.FileName, rsa.ExportPkcs8PrivateKeyPem());
                     }
-
-                    // Upload public key and other user info 
-                    using HttpResponseMessage response = await HttpService.client.PostAsync("https://localhost:7042/api/userauth/register", userJsonContent);
-                    response.EnsureSuccessStatusCode();
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    FeedbackMessage = responseBody;
-
+                    else
+                    {
+                        throw new DirectoryNotFoundException();
+                    }
+                    
                 }
                 catch (HttpRequestException e)
+                {
+                    FeedbackMessage = e.Message;
+                }
+                catch (DirectoryNotFoundException e)
                 {
                     FeedbackMessage = e.Message;
                 }
