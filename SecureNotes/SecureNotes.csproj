@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="Assets\Images\key.png" />
     <None Remove="Assets\Images\lock.png" />
+    <None Remove="Assets\Images\message.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +19,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Images\lock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\message.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

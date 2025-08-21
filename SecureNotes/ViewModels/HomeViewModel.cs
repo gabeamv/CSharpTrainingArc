@@ -35,9 +35,11 @@ namespace SecureNotes.ViewModels
         public ICommand ChangeKey { get; }
         public ICommand NavigateEncryptFile { get; }
         public ICommand NavigateDecryptFile { get; }
+        public ICommand NavigateMessage { get; }
         public HomeViewModel(NavigationService nav) {
             NavigateEncryptFile = new RelayCommand(() => { nav.NavigateTo(new EncryptViewModel(nav)); });
             NavigateDecryptFile = new RelayCommand(() => { nav.NavigateTo(new DecryptViewModel(nav)); });
+            NavigateMessage = new RelayCommand(() => { nav.NavigateTo(new MessageViewModel(nav)); });
             ExportKey = new RelayCommand(() => { ExportUserKey(); });
             ChangeKey = new RelayCommand(() => { ImportUserKey(); });
         }
