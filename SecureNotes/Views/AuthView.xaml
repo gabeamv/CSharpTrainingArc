@@ -39,9 +39,7 @@
                 Width="50" Command="{Binding LoginCommand}"/>
             <TextBlock Text="{Binding FeedbackMessage}" Height="100" Width="700"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
-        <Button Grid.Row="2" x:Name="EnterApp" Content="Encrypt Or Decrypt Your Notes" Height="25" 
-                Width="200" Command="{Binding LoginCommand}"/>
-        
+
         <!-->
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <userControls:ClearableTextBox x:Name="UsernameTextBox" TextLabel="Username"/>

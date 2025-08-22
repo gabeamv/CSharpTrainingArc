@@ -18,6 +18,7 @@ namespace SecureNotes.ViewModels
     {
         private FileService _fileService = new FileService();
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
+        private HttpService _http;
 
         private string _feedbackMessage;
         public string FeedbackMessage
@@ -28,9 +29,9 @@ namespace SecureNotes.ViewModels
                 OnPropertyChanged();
             }
         }
-        public DecryptViewModel(NavigationService navService)
+        public DecryptViewModel(NavigationService navService, HttpService http)
         {
-            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService)));
+            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService, http)));
             DecryptFile = new RelayCommand(() => this.Decrypt());
         }
 

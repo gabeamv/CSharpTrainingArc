@@ -13,5 +13,10 @@
             HashedPassword = hashedPassword;
             PublicKey = publicKey;
         }
+
+        public override string ToString()
+        {
+            return Username;
+        }
     }
 }

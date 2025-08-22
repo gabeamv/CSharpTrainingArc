@@ -21,6 +21,13 @@ namespace SecureNotesWebApi.Controllers
             return Ok("API is working");
         }
 
+        [HttpGet("get_users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            //List<UserAuth> users = await _context.UserAuths.ToListAsync();
+            return Ok(await _context.UserAuths.ToListAsync());
+        }
+
         // Method to register a new user.
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserAuth userAuth)

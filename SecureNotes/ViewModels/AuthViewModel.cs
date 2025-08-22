@@ -80,8 +80,9 @@ namespace SecureNotes.ViewModels
 
         public ICommand LoginCommand { get; }
         public ICommand RegisterCommand { get; }
-        public AuthViewModel(NavigationService nav) {
+        public AuthViewModel(NavigationService nav, HttpService http) {
             _nav = nav;
+            _http = http;
             LoginCommand = new RelayCommand(() => { 
                 try
                 {
@@ -109,7 +110,7 @@ namespace SecureNotes.ViewModels
 
         private void NavigateTo(object o, RoutedEventArgs e)
         {
-            _nav.NavigateTo(new HomeViewModel(_nav));
+            _nav.NavigateTo(new HomeViewModel(_nav, _http));
         }
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
@@ -182,7 +183,7 @@ namespace SecureNotes.ViewModels
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    _nav.NavigateTo(new HomeViewModel(_nav));
+                    _nav.NavigateTo(new HomeViewModel(_nav, _http));
                 }
             }
             catch (HttpRequestException e)

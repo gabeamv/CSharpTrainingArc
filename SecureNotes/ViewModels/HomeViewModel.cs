@@ -18,6 +18,7 @@ namespace SecureNotes.ViewModels
     {
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
         private FileService _fileService = new FileService();
+        private HttpService _http;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -36,10 +37,10 @@ namespace SecureNotes.ViewModels
         public ICommand NavigateEncryptFile { get; }
         public ICommand NavigateDecryptFile { get; }
         public ICommand NavigateMessage { get; }
-        public HomeViewModel(NavigationService nav) {
-            NavigateEncryptFile = new RelayCommand(() => { nav.NavigateTo(new EncryptViewModel(nav)); });
-            NavigateDecryptFile = new RelayCommand(() => { nav.NavigateTo(new DecryptViewModel(nav)); });
-            NavigateMessage = new RelayCommand(() => { nav.NavigateTo(new MessageViewModel(nav)); });
+        public HomeViewModel(NavigationService nav, HttpService http) {
+            NavigateEncryptFile = new RelayCommand(() => { nav.NavigateTo(new EncryptViewModel(nav, http)); });
+            NavigateDecryptFile = new RelayCommand(() => { nav.NavigateTo(new DecryptViewModel(nav, http)); });
+            NavigateMessage = new RelayCommand(() => { nav.NavigateTo(new MessageViewModel(nav, http)); });
             ExportKey = new RelayCommand(() => { ExportUserKey(); });
             ChangeKey = new RelayCommand(() => { ImportUserKey(); });
         }

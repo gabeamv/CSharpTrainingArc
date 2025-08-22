@@ -32,7 +32,7 @@ namespace SecureNotes.ViewModels
             var navService = new NavigationService(viewModel => CurrentViewModel = viewModel);
             var httpService = new HttpService();
             
-            CurrentViewModel = new AuthViewModel(navService);
+            CurrentViewModel = new AuthViewModel(navService, httpService);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

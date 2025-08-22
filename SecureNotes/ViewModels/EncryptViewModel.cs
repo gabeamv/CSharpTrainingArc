@@ -17,9 +17,9 @@ namespace SecureNotes.ViewModels
     {
         private FileService _fileService = new FileService();
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
-        public EncryptViewModel(NavigationService navService) 
+        public EncryptViewModel(NavigationService navService, HttpService http) 
         {
-            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService)));
+            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService, http)));
             EncryptFile = new RelayCommand(() => Encrypt());
         }
 
