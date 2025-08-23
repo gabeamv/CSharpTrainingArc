@@ -14,6 +14,7 @@ namespace SecureNotes.Services
     {
         // Static aes algorithm that persists throughout the lifetime of the application.
         public static Aes AesAlg { get; private set; } = Aes.Create();
+        // TODO: Implement AesGcm
         public EncryptDecryptService() {
             // AesAlg.Padding = PaddingMode.None;
             
@@ -39,6 +40,17 @@ namespace SecureNotes.Services
             
         }
 
+        public byte[] RsaEncryptBytes(byte[] bytes, string pem)
+        {
+            byte[] cipherText;
+            using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+            {
+                RSA.ImportFromPem(pem);
+                cipherText = RSA.Encrypt(bytes, true);
+            }
+            return cipherText;
+        }
+
         public string AesDecryptBytes(byte[] cipherText)
         {
             if (cipherText == null || cipherText.Length <= 0)
@@ -62,12 +74,18 @@ namespace SecureNotes.Services
             return decryption;
         }
 
+
         public static void ChangeAesKey(byte[] key = null, byte[] iv = null, PaddingMode mode = PaddingMode.None)
         {
 
             if (key != null) AesAlg.Key = key;
             if (iv != null) AesAlg.IV = iv;
             if (mode != PaddingMode.None) AesAlg.Padding = mode;
+        }
+
+        public static void GenerateAes()
+        {
+            AesAlg = Aes.Create();
         }
 
         public static string GetKeyIV()
