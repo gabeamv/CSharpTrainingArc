@@ -13,7 +13,8 @@ namespace SecureNotes.Services
     public class HttpService
     {
         public static readonly HttpClient client = new HttpClient();
-        public static readonly string link = "https://localhost:7042/api";
+        public static readonly string API = "https://localhost:7042/api";
+        public static readonly string API_SEND_PAYLOAD = API + "/payload/send";
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true
@@ -24,7 +25,7 @@ namespace SecureNotes.Services
 
         public async Task<List<UserAuth>> GetUsers()
         {
-            using HttpResponseMessage response = await HttpService.client.GetAsync(link + "/userauth/get_users");
+            using HttpResponseMessage response = await HttpService.client.GetAsync(API + "/userauth/get_users");
             if (response.IsSuccessStatusCode)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();

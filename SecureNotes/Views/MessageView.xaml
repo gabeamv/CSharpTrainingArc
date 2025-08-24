@@ -16,13 +16,17 @@
             <Button Content="Refresh Users" Width="80" Height="20" Command="{Binding LoadUsers}" Margin="10, 0, 0, 0"/>
             <TextBox Text="{Binding FeedbackMessage}" Height="20" Width="200" Margin="20, 0 ,0, 0"/>
         </StackPanel>
-
-        <ComboBox Grid.Row="1" ItemsSource="{Binding Users}" Height="25" VerticalAlignment="Top" SelectedItem="{Binding Recipient}" Margin="10, 0, 10, 0">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Username}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        
+        <StackPanel Grid.Row="1" Width="500">
+            <ComboBox ItemsSource="{Binding Users}" Height="25" VerticalAlignment="Top" SelectedItem="{Binding Recipient}" Margin="10, 0, 10, 0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Username}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Content="Send Files" Name="Button_SendPayload" Width="100" Height="20" Margin="0, 20, 0, 0" Command="{Binding SendFiles}"/>
+        </StackPanel>
+        
     </Grid>
 </UserControl>

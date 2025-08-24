@@ -25,12 +25,15 @@ namespace SecureNotes.ViewModels
         private FileService _fileService = new FileService();
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
         private List<UserAuth> _users = new List<UserAuth>();
+        private UserAuth currentUser;
 
+        private bool _sendFilesVisible = false;
         private string _feedbackMessage = "Feedback Message";
         private UserAuth _recipient;
 
         public ICommand NavigateHome { get; }
         public ICommand LoadUsers { get; }
+        public ICommand SendFiles { get; }
 
         public string FeedbackMessage 
         { 
@@ -62,12 +65,24 @@ namespace SecureNotes.ViewModels
             }
         }
 
+        public bool SendFilesVisible
+        {
+            get { return _sendFilesVisible; }
+            set
+            {
+                _sendFilesVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
-        public MessageViewModel(NavigationService nav, HttpService http)
+        public MessageViewModel(NavigationService nav, HttpService http, UserAuth user)
         {
             _http = http;
-            NavigateHome = new RelayCommand(() => nav.NavigateTo(new HomeViewModel(nav, http)));
+            currentUser = user;
+            NavigateHome = new RelayCommand(() => nav.NavigateTo(new HomeViewModel(nav, http, user)));
             LoadUsers = new RelayCommand(async () => { await _LoadUsers(); });
+            SendFiles = new RelayCommand(async () => { await CreateSendPayload(); });
         }
 
 
@@ -79,7 +94,7 @@ namespace SecureNotes.ViewModels
         // Method to read files, aes encrypt files, rsa encrypt the aes key, convert aes key into base64,
         // and store into payload to be sent through http request later on.
         // TODO: implement multiple files.
-        public void CreatePayload()
+        public async Task CreateSendPayload()
         {
             try
             {
@@ -87,7 +102,7 @@ namespace SecureNotes.ViewModels
 
                 // Open and read file.
                 OpenFileDialog fileSelection = new OpenFileDialog();
-                fileSelection.Filter = "Select Files |All files (*.*)";
+                fileSelection.Filter = "All Files (*.*)|*.*";
                 bool? success = fileSelection.ShowDialog();
                 if (success == true)
                 {
@@ -95,10 +110,11 @@ namespace SecureNotes.ViewModels
                     byte[] data = _fileService.ReadTxtFileAsBytes(filePath);
                     // Encrypt Data
                     // TODO: Implement AesGcm
-                    EncryptDecryptService.GenerateAes(); // generate new aes key
+                    EncryptDecryptService.GenerateAes(); // generate a random new aes key
                     // Data that will be stored in the payload.
-                    byte[] cipherText = _encryptDecryptService.AesEncryptBytes(data);
-                    string uuid = Guid.NewGuid().ToString(); // ID
+                    string cipherText = Convert.ToBase64String(_encryptDecryptService.AesEncryptBytes(data));
+                    // ID
+                    string uuid = Guid.NewGuid().ToString();
                     // Key and IV
                     string encryptedEncodedAesKey = Convert.ToBase64String(_encryptDecryptService.RsaEncryptBytes(EncryptDecryptService.AesAlg.Key, Recipient.PublicKey));
                     string encodedIV = Convert.ToBase64String(EncryptDecryptService.AesAlg.IV);
@@ -106,14 +122,31 @@ namespace SecureNotes.ViewModels
                     // Construct the payload
                     Payload payload = new Payload
                     {
-                        ID = uuid,
-                        Sender = "TODO",
+                        UUID = uuid,
+                        Sender = currentUser.Username,
                         Recipient = Recipient.Username,
+                        Ciphertext = cipherText,
                         Key = encryptedEncodedAesKey,
                         IV = encodedIV,
                         Format = "TODO",
                         Timestamp = univDateTime
                     };
+                    // Serialize payload and prepare it to be sent.
+                    string jsonPayload = JsonSerializer.Serialize(payload);
+                    StringContent payloadContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                    // Make an api request to send the payload to the user.
+                    try
+                    {
+                        using HttpResponseMessage response = await HttpService.client.PostAsync(HttpService.API_SEND_PAYLOAD, payloadContent);
+                        response.EnsureSuccessStatusCode();
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        FeedbackMessage = responseBody;
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        FeedbackMessage = e.Message;
+                    }
+                    
                 }
                 else
                 {
@@ -125,8 +158,6 @@ namespace SecureNotes.ViewModels
                 FeedbackMessage = "Recipient is null";
             }
         }
-
-        
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
         {

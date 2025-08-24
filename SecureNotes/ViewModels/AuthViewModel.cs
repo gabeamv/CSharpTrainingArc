@@ -108,11 +108,6 @@ namespace SecureNotes.ViewModels
             PasswordText = "Test123";
         }
 
-        private void NavigateTo(object o, RoutedEventArgs e)
-        {
-            _nav.NavigateTo(new HomeViewModel(_nav, _http));
-        }
-
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(stringProperty));
@@ -183,7 +178,7 @@ namespace SecureNotes.ViewModels
                 response.EnsureSuccessStatusCode();
                 if (response.IsSuccessStatusCode)
                 {
-                    _nav.NavigateTo(new HomeViewModel(_nav, _http));
+                    _nav.NavigateTo(new HomeViewModel(_nav, _http, user));
                 }
             }
             catch (HttpRequestException e)

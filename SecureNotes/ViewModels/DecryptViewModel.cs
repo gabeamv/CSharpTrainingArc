@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Security.Cryptography;
+using SecureNotes.Models;
 
 namespace SecureNotes.ViewModels
 {
@@ -29,9 +30,9 @@ namespace SecureNotes.ViewModels
                 OnPropertyChanged();
             }
         }
-        public DecryptViewModel(NavigationService navService, HttpService http)
+        public DecryptViewModel(NavigationService navService, HttpService http, UserAuth user)
         {
-            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService, http)));
+            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService, http, user)));
             DecryptFile = new RelayCommand(() => this.Decrypt());
         }
 

@@ -16,10 +16,11 @@ namespace SecureNotesWebApi.Controllers
         }
 
         [HttpPost("send")]
-        public async Task<IActionResult> Send(Payload message)
+        public async Task<IActionResult> Send(Payload payload)
         {
-            await _context.Messages.AddAsync(message);
-            return Ok();
+            await _context.Messages.AddAsync(payload);
+            await _context.SaveChangesAsync();
+            return Ok($"Payload '{payload.UUID}' has been sent.");
         }
     }
 }

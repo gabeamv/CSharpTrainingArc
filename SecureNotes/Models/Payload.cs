@@ -8,9 +8,10 @@ namespace SecureNotes.Models
 {
     public class Payload
     {
-        public string ID { get; set; }
+        public string UUID { get; set; }
         public string Sender { get; set; }
         public string Recipient { get; set; }
+        public string Ciphertext { get; set; }
         public string Key { get; set; }
         public string IV { get; set; }
         public string Format { get; set; }

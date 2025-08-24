@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using SecureNotes.Commands;
+using SecureNotes.Models;
 using SecureNotes.Services;
 using System;
 using System.Collections.Generic;
@@ -17,9 +18,9 @@ namespace SecureNotes.ViewModels
     {
         private FileService _fileService = new FileService();
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
-        public EncryptViewModel(NavigationService navService, HttpService http) 
+        public EncryptViewModel(NavigationService navService, HttpService http, UserAuth user) 
         {
-            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService, http)));
+            NavigateHome = new RelayCommand(() => navService.NavigateTo(new HomeViewModel(navService, http, user)));
             EncryptFile = new RelayCommand(() => Encrypt());
         }
 

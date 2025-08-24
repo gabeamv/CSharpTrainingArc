@@ -5,9 +5,10 @@ namespace SecureNotesWebApi.Models
     public class Payload
     {
         [Key]
-        public required string ID { get; set; }
+        public required string UUID { get; set; }
         public required string Sender { get; set; }
         public required string Recipient { get; set; }
+        public required string Ciphertext { get; set; }
         public required string Key { get; set; }
         public required string IV { get; set; }
         public required string Format { get; set; }
