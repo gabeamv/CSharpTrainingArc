@@ -25,15 +25,18 @@ namespace SecureNotes.ViewModels
         private FileService _fileService = new FileService();
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
         private List<UserAuth> _users = new List<UserAuth>();
+        private List<Payload> _userMessages = new List<Payload>();
         private UserAuth currentUser;
 
         private bool _sendFilesVisible = false;
         private string _feedbackMessage = "Feedback Message";
         private UserAuth _recipient;
+        private Payload _selectedMessage;
 
         public ICommand NavigateHome { get; }
         public ICommand LoadUsers { get; }
         public ICommand SendFiles { get; }
+        public ICommand LoadMessages { get; }
 
         public string FeedbackMessage 
         { 
@@ -55,12 +58,32 @@ namespace SecureNotes.ViewModels
 
         }
 
+        public List<Payload> UserMessages
+        {
+            get { return _userMessages; }
+            set
+            {
+                _userMessages = value;
+                OnPropertyChanged();
+            }
+        }
+
         public UserAuth Recipient
         {
             get { return _recipient; }
             set
             {
                 _recipient = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Payload SelectedMessage
+        {
+            get { return _selectedMessage; }
+            set
+            {
+                _selectedMessage = value;
                 OnPropertyChanged();
             }
         }
@@ -82,6 +105,7 @@ namespace SecureNotes.ViewModels
             currentUser = user;
             NavigateHome = new RelayCommand(() => nav.NavigateTo(new HomeViewModel(nav, http, user)));
             LoadUsers = new RelayCommand(async () => { await _LoadUsers(); });
+            LoadMessages = new RelayCommand(async () => { await _LoadMessages(); });
             SendFiles = new RelayCommand(async () => { await CreateSendPayload(); });
         }
 
@@ -89,6 +113,11 @@ namespace SecureNotes.ViewModels
         public async Task _LoadUsers()
         {
             Users = await _http.GetUsers();
+        }
+
+        public async Task _LoadMessages()
+        {
+            UserMessages = await _http.GetAllMessages(currentUser.Username);
         }
 
         // Method to read files, aes encrypt files, rsa encrypt the aes key, convert aes key into base64,
@@ -158,6 +187,8 @@ namespace SecureNotes.ViewModels
                 FeedbackMessage = "Recipient is null";
             }
         }
+
+        
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
         {
