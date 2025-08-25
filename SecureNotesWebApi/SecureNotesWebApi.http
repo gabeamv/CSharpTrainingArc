@@ -33,4 +33,22 @@ Content-Type: application/json
   "hashedPassword": "test123"
 }
 
+
+
+###
+
+POST {{SecureNotesWebApi_HostAddress}}/api/payload/send
+Content-Type: application/json
+
+{
+  "uuid": "testID",
+  "sender": "testSender",
+  "recipient": "testRecipient",
+  "ciphertext": "testCiphertext",
+  "key": "testKey",
+  "iv": "testIV",
+  "format": "testFormat",
+  "timestamp": "2025-08-24T17:30:00Z"
+}
+
 ###

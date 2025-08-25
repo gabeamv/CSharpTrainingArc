@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SecureNotesWebApi.Context;
 using SecureNotesWebApi.Models;
 
@@ -21,6 +22,15 @@ namespace SecureNotesWebApi.Controllers
             await _context.Messages.AddAsync(payload);
             await _context.SaveChangesAsync();
             return Ok($"Payload '{payload.UUID}' has been sent.");
+        }
+
+        [HttpGet("received_messages/{username}")]
+        public async Task<ActionResult<List<Payload>>> GetAllMessages([FromRoute] string username)
+        {
+            var userReceivedMessages = await _context.Messages
+                .Where(message => message.Recipient == username)
+                .ToListAsync();
+            return Ok(userReceivedMessages);
         }
     }
 }

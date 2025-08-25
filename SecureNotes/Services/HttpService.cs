@@ -15,6 +15,7 @@ namespace SecureNotes.Services
         public static readonly HttpClient client = new HttpClient();
         public static readonly string API = "https://localhost:7042/api";
         public static readonly string API_SEND_PAYLOAD = API + "/payload/send";
+        public static readonly string API_GET_ALL_MESSAGES = API + "/payload/received_messages/";
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true
@@ -32,6 +33,17 @@ namespace SecureNotes.Services
                 return JsonSerializer.Deserialize<List<UserAuth>>(responseBody, JsonOptions) ?? new List<UserAuth>();
             }
             return new List<UserAuth>();
+        }
+
+        public async Task<List<Payload>> GetAllMessages(string username)
+        {
+            using HttpResponseMessage response = await HttpService.client.GetAsync(API_GET_ALL_MESSAGES + username);
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<Payload>>(responseBody, JsonOptions) ?? new List<Payload>();
+            }
+            return new List<Payload>();
         }
 
     }
