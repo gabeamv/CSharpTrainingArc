@@ -26,7 +26,7 @@ namespace SecureNotes.ViewModels
         private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
         private List<UserAuth> _users = new List<UserAuth>();
         private List<Payload> _userMessages = new List<Payload>();
-        private UserAuth currentUser;
+        private UserAuth _currentUser;
 
         private bool _sendFilesVisible = false;
         private string _feedbackMessage = "Feedback Message";
@@ -37,6 +37,7 @@ namespace SecureNotes.ViewModels
         public ICommand LoadUsers { get; }
         public ICommand SendFiles { get; }
         public ICommand LoadMessages { get; }
+        public ICommand DownloadPayload { get; }
 
         public string FeedbackMessage 
         { 
@@ -78,6 +79,16 @@ namespace SecureNotes.ViewModels
             }
         }
 
+        public UserAuth CurrentUser
+        {
+            get { return _currentUser; }
+            set
+            {
+                _currentUser = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Payload SelectedMessage
         {
             get { return _selectedMessage; }
@@ -102,11 +113,12 @@ namespace SecureNotes.ViewModels
         public MessageViewModel(NavigationService nav, HttpService http, UserAuth user)
         {
             _http = http;
-            currentUser = user;
+            _currentUser = user;
             NavigateHome = new RelayCommand(() => nav.NavigateTo(new HomeViewModel(nav, http, user)));
             LoadUsers = new RelayCommand(async () => { await _LoadUsers(); });
             LoadMessages = new RelayCommand(async () => { await _LoadMessages(); });
             SendFiles = new RelayCommand(async () => { await CreateSendPayload(); });
+            DownloadPayload = new RelayCommand(() => { _DownloadPayload(); });
         }
 
 
@@ -117,7 +129,7 @@ namespace SecureNotes.ViewModels
 
         public async Task _LoadMessages()
         {
-            UserMessages = await _http.GetAllMessages(currentUser.Username);
+            UserMessages = await _http.GetAllMessages(CurrentUser.Username);
         }
 
         // Method to read files, aes encrypt files, rsa encrypt the aes key, convert aes key into base64,
@@ -152,7 +164,7 @@ namespace SecureNotes.ViewModels
                     Payload payload = new Payload
                     {
                         UUID = uuid,
-                        Sender = currentUser.Username,
+                        Sender = CurrentUser.Username,
                         Recipient = Recipient.Username,
                         Ciphertext = cipherText,
                         Key = encryptedEncodedAesKey,
@@ -188,7 +200,10 @@ namespace SecureNotes.ViewModels
             }
         }
 
-        
+        public void _DownloadPayload()
+        {
+
+        }
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
         {
