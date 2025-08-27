@@ -26,6 +26,26 @@ namespace SecureNotes.Services
             }
         }
 
+        public void WriteAllBytes(string path, byte[] bytes)
+        {
+            try
+            {
+                File.WriteAllBytes(path, bytes);
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                throw new DirectoryNotFoundException();
+            }
+            catch (IOException e)
+            {
+                throw new IOException();
+            }
+            catch (ArgumentNullException e)
+            {
+                throw new ArgumentNullException();
+            }
+        }
+
         public string ReadTxtFileAsString(string path)
         {
             try

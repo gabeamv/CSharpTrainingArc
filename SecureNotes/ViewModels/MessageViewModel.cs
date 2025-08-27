@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Printing;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -134,7 +135,7 @@ namespace SecureNotes.ViewModels
 
         // Method to read files, aes encrypt files, rsa encrypt the aes key, convert aes key into base64,
         // and store into payload to be sent through http request later on.
-        // TODO: implement multiple files.
+        // TODO: implement multiple files to be selected.
         public async Task CreateSendPayload()
         {
             try
@@ -202,7 +203,45 @@ namespace SecureNotes.ViewModels
 
         public void _DownloadPayload()
         {
+            // 1. Open file dialog, user selects private key.
+            OpenFileDialog privateKeySelection = new OpenFileDialog
+            {
+                Filter = "Select Private Key (*.txt) | *.txt"    
+            };
 
+            bool? success = privateKeySelection.ShowDialog();
+
+            if (success == true)
+            {
+                // 2. Convert encoded base64 aes key to byte[].
+                byte[] cipherTextAesKey = Convert.FromBase64String(SelectedMessage.Key);
+                // 3. Decrypt byte[] aes key using user rsa private key
+                string privateKeyPem = _fileService.ReadTxtFileAsString(privateKeySelection.FileName);
+                byte[] aesKey = _encryptDecryptService.RsaDecryptBytes(cipherTextAesKey, privateKeyPem);
+                // 4. Convert encoded base64 ciphertext to byte[].
+                byte[] cipherText = Convert.FromBase64String(SelectedMessage.Ciphertext);
+                // 5. Convert encoded base64 IV to byte[].
+                byte[] iv = Convert.FromBase64String(SelectedMessage.IV);
+                // 6. Decrypt byte[] ciphertext using aes key and IV.
+                EncryptDecryptService.ChangeAesKey(aesKey, iv);
+                string plaintextStr = _encryptDecryptService.AesDecryptBytes(cipherText);
+                // 7. Open file dialog, user selects and stores directory where data will be saved.
+                OpenFileDialog fileDestination = new OpenFileDialog
+                {
+                    CheckFileExists = false,
+                    ValidateNames = false,
+                    Multiselect = false,
+                    // TODO: 8. Append the directory string with the file name, as well as the format of the file.
+                    FileName = $"{SelectedMessage.UUID}.txt"
+                };
+                success = fileDestination.ShowDialog();
+                if (success == true)
+                {
+                    // 9. Write bytes to path. 
+                    // TODO: Generalize it for all formats instead of just .txt files.
+                    _fileService.WriteStringTxtFile(fileDestination.FileName, plaintextStr);
+                }
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)

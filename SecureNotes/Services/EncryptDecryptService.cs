@@ -40,15 +40,26 @@ namespace SecureNotes.Services
             
         }
 
-        public byte[] RsaEncryptBytes(byte[] bytes, string pem)
+        public byte[] RsaEncryptBytes(byte[] bytes, string publicKeyPem)
         {
             byte[] cipherText;
             using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
             {
-                RSA.ImportFromPem(pem);
+                RSA.ImportFromPem(publicKeyPem);
                 cipherText = RSA.Encrypt(bytes, true);
             }
             return cipherText;
+        }
+
+        public byte[] RsaDecryptBytes(byte[] bytes, string privateKeyPem)
+        {
+            byte[] plainTextBytes;
+            using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+            {
+                RSA.ImportFromPem(privateKeyPem);
+                plainTextBytes = RSA.Decrypt(bytes, true);
+            }
+            return plainTextBytes;
         }
 
         public string AesDecryptBytes(byte[] cipherText)
