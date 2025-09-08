@@ -12,13 +12,13 @@ namespace SecureNotes.Services
 {
     public class FileService : IFileService
     {
-        public byte[] ReadTxtFileAsBytes(string path)
+        public byte[] ReadAllBytes(string path)
         {
             try
             {
                 // Read the file 
-                byte[] text = File.ReadAllBytes(path);
-                return text;
+                byte[] bytes = File.ReadAllBytes(path);
+                return bytes;
             }
             catch(FileNotFoundException e)
             {

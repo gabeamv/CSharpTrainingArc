@@ -149,18 +149,14 @@ namespace SecureNotes.ViewModels
                 if (success == true)
                 {
                     string filePath = fileSelection.FileName;
-                    byte[] data = _fileService.ReadTxtFileAsBytes(filePath);
-                    // Encrypt Data
+                    byte[] data = _fileService.ReadAllBytes(filePath);
                     // TODO: Implement AesGcm
                     EncryptDecryptService.GenerateAes(); // generate a random new aes key
-                    // Data that will be stored in the payload.
                     string cipherText = Convert.ToBase64String(_encryptDecryptService.AesEncryptBytes(data));
-                    // ID
                     string uuid = Guid.NewGuid().ToString();
-                    // Key and IV
                     string encryptedEncodedAesKey = Convert.ToBase64String(_encryptDecryptService.RsaEncryptBytes(EncryptDecryptService.AesAlg.Key, Recipient.PublicKey));
                     string encodedIV = Convert.ToBase64String(EncryptDecryptService.AesAlg.IV);
-                    DateTime univDateTime = DateTime.Now.ToUniversalTime(); // Timestamp
+                    DateTime univDateTime = DateTime.Now.ToUniversalTime();
                     // Construct the payload
                     Payload payload = new Payload
                     {
@@ -170,7 +166,7 @@ namespace SecureNotes.ViewModels
                         Ciphertext = cipherText,
                         Key = encryptedEncodedAesKey,
                         IV = encodedIV,
-                        Format = "TODO",
+                        Format = fileSelection.SafeFileName,
                         Timestamp = univDateTime
                     };
                     // Serialize payload and prepare it to be sent.
@@ -224,22 +220,21 @@ namespace SecureNotes.ViewModels
                 byte[] iv = Convert.FromBase64String(SelectedMessage.IV);
                 // 6. Decrypt byte[] ciphertext using aes key and IV.
                 EncryptDecryptService.ChangeAesKey(aesKey, iv);
-                string plaintextStr = _encryptDecryptService.AesDecryptBytes(cipherText);
+                byte[] plaintextBytes = _encryptDecryptService.AesDecryptBytes(cipherText);
                 // 7. Open file dialog, user selects and stores directory where data will be saved.
                 OpenFileDialog fileDestination = new OpenFileDialog
                 {
                     CheckFileExists = false,
                     ValidateNames = false,
                     Multiselect = false,
-                    // TODO: 8. Append the directory string with the file name, as well as the format of the file.
-                    FileName = $"{SelectedMessage.UUID}.txt"
+                    // 8. Append the directory string with the file name, as well as the format of the file.
+                    FileName = SelectedMessage.Format
                 };
                 success = fileDestination.ShowDialog();
                 if (success == true)
                 {
-                    // 9. Write bytes to path. 
-                    // TODO: Generalize it for all formats instead of just .txt files.
-                    _fileService.WriteStringTxtFile(fileDestination.FileName, plaintextStr);
+                    // 9. Write bytes to path. Generalize it for all formats instead of just .txt files.
+                    _fileService.WriteAllBytes(fileDestination.FileName, plaintextBytes);
                 }
             }
         }

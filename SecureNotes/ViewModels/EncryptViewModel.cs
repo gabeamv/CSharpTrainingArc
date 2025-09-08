@@ -43,26 +43,26 @@ namespace SecureNotes.ViewModels
 
         private void Encrypt()
         {
-            OpenFileDialog txtSelection = new OpenFileDialog();
-            txtSelection.Filter = "Please Select A .txt File (*.txt) | *.txt";
-            bool? success = txtSelection.ShowDialog();
+            OpenFileDialog fileSelection = new OpenFileDialog();
+            fileSelection.Filter = "Select A File (*.*)|*.*";
+            bool? success = fileSelection.ShowDialog();
             if (success == true)
             {
-                string filePath = txtSelection.FileName;
-                byte[] txtData = _fileService.ReadTxtFileAsBytes(filePath);
+                string filePath = fileSelection.FileName;
+                byte[] txtData = _fileService.ReadAllBytes(filePath);
                 byte[] cipherTextByte = _encryptDecryptService.AesEncryptBytes(txtData);
                 string strCipher = Convert.ToBase64String(cipherTextByte);
 
                 OpenFileDialog dirSelection = new OpenFileDialog();
-                dirSelection.Filter = "Please Select The Directory For The .txt File | *.txt*";
+                dirSelection.Filter = "Select Directory (*.*)|*.*";
                 dirSelection.CheckFileExists = false;
                 dirSelection.ValidateNames = false;
                 dirSelection.Multiselect = false;
-                dirSelection.FileName = "encrypted_file.txt";
+                dirSelection.FileName = $"encrypted_{fileSelection.SafeFileName}";
                 success = dirSelection.ShowDialog();
                 if (success == true)
                 {
-                    _fileService.WriteStringTxtFile(dirSelection.FileName, strCipher);
+                    _fileService.WriteAllBytes(dirSelection.FileName, cipherTextByte);
                     FeedbackMessage = "Encryption Success!";
                 }
 

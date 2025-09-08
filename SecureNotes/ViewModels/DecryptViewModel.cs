@@ -44,30 +44,26 @@ namespace SecureNotes.ViewModels
 
         public void Decrypt()
         {
-            OpenFileDialog txtSelection = new OpenFileDialog();
-            txtSelection.Filter = "Please Select A .txt File (*.txt) | *.txt";
-            bool? success = txtSelection.ShowDialog();
+            OpenFileDialog fileSelection = new OpenFileDialog();
+            fileSelection.Filter = "Select File (*.*)|*.*";
+            bool? success = fileSelection.ShowDialog();
             if (success == true)
             {
+                // TODO: To be fixed, byte to string.
                 try 
                 {
-                    
-                    string filePath = txtSelection.FileName;
-
-                    string base64 = _fileService.ReadTxtFileAsString(filePath);
-                    byte[] cipherText = Convert.FromBase64String(base64); 
-                                                                                   
-                    string plainTextStr = _encryptDecryptService.AesDecryptBytes(cipherText);
+                    byte[] cipherText = _fileService.ReadAllBytes(fileSelection.FileName);                                                          
+                    byte[] plainText = _encryptDecryptService.AesDecryptBytes(cipherText);
                     OpenFileDialog dirSelection = new OpenFileDialog();
-                    dirSelection.Filter = "Please Select The Directory | *.txt";
+                    dirSelection.Filter = "The Directory (*.*)|*.*";
                     dirSelection.CheckFileExists = false;
                     dirSelection.ValidateNames = false;
                     dirSelection.Multiselect = false;
-                    dirSelection.FileName = "decrypted_file.txt";
+                    dirSelection.FileName = $"decrypted_{fileSelection.SafeFileName}";
                     success = dirSelection.ShowDialog();
                     if (success == true)
                     {
-                        _fileService.WriteStringTxtFile(dirSelection.FileName, plainTextStr);
+                        _fileService.WriteAllBytes(dirSelection.FileName, plainText);
                         // Write the AES key to txt using the file service and the key.
                         FeedbackMessage = "Decryption Success!";
                     }

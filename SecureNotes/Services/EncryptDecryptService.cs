@@ -39,7 +39,26 @@ namespace SecureNotes.Services
             }
             
         }
+        public byte[] AesDecryptBytes(byte[] cipherText)
+        {
+            if (cipherText == null || cipherText.Length <= 0)
+                throw new ArgumentNullException(nameof(cipherText));
+            string decryption = null;
 
+
+            ICryptoTransform decryptor = AesAlg.CreateDecryptor(AesAlg.Key, AesAlg.IV);
+
+            using (MemoryStream msDecrypt = new())
+            {
+                using (CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Write))
+                {
+                    csDecrypt.Write(cipherText, 0, cipherText.Length);
+                    csDecrypt.FlushFinalBlock();
+                    return msDecrypt.ToArray();
+                }
+            }
+
+        }
         public byte[] RsaEncryptBytes(byte[] bytes, string publicKeyPem)
         {
             byte[] cipherText;
@@ -62,28 +81,7 @@ namespace SecureNotes.Services
             return plainTextBytes;
         }
 
-        public string AesDecryptBytes(byte[] cipherText)
-        {
-            if (cipherText == null || cipherText.Length <= 0)
-                throw new ArgumentNullException(nameof(cipherText));
-            string decryption = null; 
-
-            
-            ICryptoTransform decryptor = AesAlg.CreateDecryptor(AesAlg.Key, AesAlg.IV);
-
-            using (MemoryStream msDecrypt = new(cipherText))
-            {
-                using (CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read))
-                {
-                    using (StreamReader swDecrypt = new(csDecrypt))
-                    {
-                        decryption = swDecrypt.ReadToEnd();
-                    }
-                }
-            }
- 
-            return decryption;
-        }
+        
 
 
         public static void ChangeAesKey(byte[] key = null, byte[] iv = null, PaddingMode mode = PaddingMode.None)
