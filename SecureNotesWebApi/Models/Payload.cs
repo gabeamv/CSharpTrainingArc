@@ -11,6 +11,7 @@ namespace SecureNotesWebApi.Models
         public required string Ciphertext { get; set; }
         public required string Key { get; set; }
         public required string IV { get; set; }
+        public required string Tag { get; set; }
         public required string Format { get; set; }
         public required DateTime Timestamp { get; set; }
     }

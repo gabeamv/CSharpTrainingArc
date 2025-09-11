@@ -81,7 +81,31 @@ namespace SecureNotes.Services
             return plainTextBytes;
         }
 
-        
+        public (byte[] ciphertext, byte[] key, byte[] iv, byte[] tag) AesGcmEncrypt(byte[] plaintext)
+        {
+            byte[] ciphertext = new byte[plaintext.Length];
+            byte[] iv = RandomNumberGenerator.GetBytes(12);
+            byte[] tag = new byte[16]; // authentication tag produced for message.
+            byte[] key = RandomNumberGenerator.GetBytes(32);
+            using (AesGcm AesGcmAlg = new AesGcm(key, 16))
+            {
+                AesGcmAlg.Encrypt(iv, plaintext, ciphertext, tag);
+                return (ciphertext, key, iv, tag); // part of payload, used for decryption.
+            }
+            
+            
+        }
+
+        public byte[] AesGcmDecrypt(byte[] ciphertext, byte[] key, byte[] iv, byte[] tag)
+        {
+            byte[] plaintext = new byte[ciphertext.Length];
+            using (AesGcm AesGcmAlg = new AesGcm(key, 16))
+            {
+                AesGcmAlg.Decrypt(iv, ciphertext, tag, plaintext);
+                return plaintext;
+            }
+            
+        }
 
 
         public static void ChangeAesKey(byte[] key = null, byte[] iv = null, PaddingMode mode = PaddingMode.None)

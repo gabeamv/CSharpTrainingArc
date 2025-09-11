@@ -152,22 +152,25 @@ namespace SecureNotes.ViewModels
                     byte[] data = _fileService.ReadAllBytes(filePath);
                     // TODO: Implement AesGcm
                     EncryptDecryptService.GenerateAes(); // generate a random new aes key
-                    string cipherText = Convert.ToBase64String(_encryptDecryptService.AesEncryptBytes(data));
+                    (byte[] ciphertext, byte[] key, byte[] iv, byte[] tag) = _encryptDecryptService.AesGcmEncrypt(data);
+                    string ciphertext64 = Convert.ToBase64String(ciphertext);
                     string uuid = Guid.NewGuid().ToString();
-                    string encryptedEncodedAesKey = Convert.ToBase64String(_encryptDecryptService.RsaEncryptBytes(EncryptDecryptService.AesAlg.Key, Recipient.PublicKey));
-                    string encodedIV = Convert.ToBase64String(EncryptDecryptService.AesAlg.IV);
-                    DateTime univDateTime = DateTime.Now.ToUniversalTime();
+                    string ciphertextKey64 = Convert.ToBase64String(_encryptDecryptService.RsaEncryptBytes(key, Recipient.PublicKey));
+                    string iv64 = Convert.ToBase64String(iv);
+                    string tag64 = Convert.ToBase64String(tag);
+                    DateTime dateTimeUtc = DateTime.Now.ToUniversalTime();
                     // Construct the payload
                     Payload payload = new Payload
                     {
                         UUID = uuid,
                         Sender = CurrentUser.Username,
                         Recipient = Recipient.Username,
-                        Ciphertext = cipherText,
-                        Key = encryptedEncodedAesKey,
-                        IV = encodedIV,
+                        Ciphertext = ciphertext64,
+                        Key = ciphertextKey64,
+                        IV = iv64,
+                        Tag = tag64,
                         Format = fileSelection.SafeFileName,
-                        Timestamp = univDateTime
+                        Timestamp = dateTimeUtc
                     };
                     // Serialize payload and prepare it to be sent.
                     string jsonPayload = JsonSerializer.Serialize(payload);
@@ -210,17 +213,17 @@ namespace SecureNotes.ViewModels
             if (success == true)
             {
                 // 2. Convert encoded base64 aes key to byte[].
-                byte[] cipherTextAesKey = Convert.FromBase64String(SelectedMessage.Key);
+                byte[] ciphertextKey = Convert.FromBase64String(SelectedMessage.Key);
                 // 3. Decrypt byte[] aes key using user rsa private key
                 string privateKeyPem = _fileService.ReadTxtFileAsString(privateKeySelection.FileName);
-                byte[] aesKey = _encryptDecryptService.RsaDecryptBytes(cipherTextAesKey, privateKeyPem);
+                byte[] aesGcmKey = _encryptDecryptService.RsaDecryptBytes(ciphertextKey, privateKeyPem);
                 // 4. Convert encoded base64 ciphertext to byte[].
-                byte[] cipherText = Convert.FromBase64String(SelectedMessage.Ciphertext);
+                byte[] ciphertext = Convert.FromBase64String(SelectedMessage.Ciphertext);
                 // 5. Convert encoded base64 IV to byte[].
                 byte[] iv = Convert.FromBase64String(SelectedMessage.IV);
-                // 6. Decrypt byte[] ciphertext using aes key and IV.
-                EncryptDecryptService.ChangeAesKey(aesKey, iv);
-                byte[] plaintextBytes = _encryptDecryptService.AesDecryptBytes(cipherText);
+                // 6. Decrypt byte[] ciphertext using ciphertext, key, iv, tag
+                byte[] tag = Convert.FromBase64String(SelectedMessage.Tag);
+                byte[] plaintext = _encryptDecryptService.AesGcmDecrypt(ciphertext, aesGcmKey, iv, tag);
                 // 7. Open file dialog, user selects and stores directory where data will be saved.
                 OpenFileDialog fileDestination = new OpenFileDialog
                 {
@@ -234,7 +237,7 @@ namespace SecureNotes.ViewModels
                 if (success == true)
                 {
                     // 9. Write bytes to path. Generalize it for all formats instead of just .txt files.
-                    _fileService.WriteAllBytes(fileDestination.FileName, plaintextBytes);
+                    _fileService.WriteAllBytes(fileDestination.FileName, plaintext);
                 }
             }
         }

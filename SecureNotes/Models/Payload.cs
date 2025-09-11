@@ -14,6 +14,7 @@ namespace SecureNotes.Models
         public string Ciphertext { get; set; }
         public string Key { get; set; }
         public string IV { get; set; }
+        public string Tag { get; set; }
         public string Format { get; set; }
         public DateTime Timestamp { get; set; }
 
