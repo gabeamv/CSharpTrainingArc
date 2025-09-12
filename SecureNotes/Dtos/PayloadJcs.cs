@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SecureNotes.Models
+namespace SecureNotes.Dtos
 {
-    public class Payload
+    public class PayloadJcs
     {
         public string UUID { get; set; }
         public string Sender { get; set; }
@@ -16,10 +16,9 @@ namespace SecureNotes.Models
         public string IV { get; set; }
         public string Tag { get; set; }
         public string Format { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string Signature { get; set; }
+        public string Timestamp { get; set; }
 
-        public Payload()
+        public PayloadJcs()
         {
 
         }

@@ -1,30 +1,29 @@
-﻿using SecureNotes.IServices;
+﻿using SecureNotes.Dtos;
+using SecureNotes.IServices;
+using SecureNotes.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace SecureNotes.Services
 {
     public class EncryptDecryptService : IEncryptDecryptService
     {
-        // Static aes algorithm that persists throughout the lifetime of the application.
         public static Aes AesAlg { get; private set; } = Aes.Create();
 
         public EncryptDecryptService() {
-            // AesAlg.Padding = PaddingMode.None;
-            
         }
 
         public byte[] AesEncryptBytes(byte[] bytes)
         {
             if (bytes == null || bytes.Length <= 0) 
                 throw new ArgumentNullException(nameof(bytes));
-            byte[] encryption;
 
             ICryptoTransform encryptor = AesAlg.CreateEncryptor(AesAlg.Key, AesAlg.IV);
 
@@ -32,9 +31,9 @@ namespace SecureNotes.Services
             {
                 using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
                 {
-                    csEncrypt.Write(bytes, 0, bytes.Length); // encrypt data
-                    csEncrypt.FlushFinalBlock(); // finalize encryption process: last block, padding
-                    return msEncrypt.ToArray(); // store in an array of bytes
+                    csEncrypt.Write(bytes, 0, bytes.Length);
+                    csEncrypt.FlushFinalBlock();
+                    return msEncrypt.ToArray();
                 }
             }
             
@@ -43,8 +42,6 @@ namespace SecureNotes.Services
         {
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException(nameof(cipherText));
-            string decryption = null;
-
 
             ICryptoTransform decryptor = AesAlg.CreateDecryptor(AesAlg.Key, AesAlg.IV);
 
@@ -81,6 +78,17 @@ namespace SecureNotes.Services
             return plainTextBytes;
         }
 
+        public byte[] Signature(PayloadJcs payloadJcs, string privateKeyPem)
+        {
+            String payloadJcsSerial = JsonSerializer.Serialize<PayloadJcs>(payloadJcs);
+            byte[] canon = Encoding.UTF8.GetBytes(payloadJcsSerial);
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportFromPem(privateKeyPem);
+                return rsa.SignData(canon, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            }
+        }
+
         public (byte[] ciphertext, byte[] key, byte[] iv, byte[] tag) AesGcmEncrypt(byte[] plaintext)
         {
             byte[] ciphertext = new byte[plaintext.Length];
@@ -103,7 +111,6 @@ namespace SecureNotes.Services
                 return plaintext;
             }
         }
-
 
         public static void ChangeAesKey(byte[] key = null, byte[] iv = null, PaddingMode mode = PaddingMode.None)
         {

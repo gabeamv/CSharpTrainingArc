@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using SecureNotes.Commands;
+using SecureNotes.Dtos;
 using SecureNotes.Models;
 using SecureNotes.Services;
 using System;
@@ -156,8 +157,38 @@ namespace SecureNotes.ViewModels
                     string ciphertextKey64 = Convert.ToBase64String(_encryptDecryptService.RsaEncryptBytes(key, Recipient.PublicKey));
                     string iv64 = Convert.ToBase64String(iv);
                     string tag64 = Convert.ToBase64String(tag);
-                    DateTime dateTimeUtc = DateTime.Now.ToUniversalTime();
+                    DateTime dateTimeUtc = DateTime.UtcNow;
 
+                    // 1. Select private key.
+                    OpenFileDialog privateKeySelection = new OpenFileDialog();
+                    privateKeySelection.Filter = "Select Key (*.*)|*.*";
+                    success = privateKeySelection.ShowDialog();
+                    string privateKeyPem = "";
+                    if (success == true)
+                    {
+                        privateKeyPem = _fileService.ReadTxtFileAsString(privateKeySelection.FileName);
+                    }
+                    else
+                    {
+                        // Throw exception if not chosen
+                    }
+
+                    // 2. Encapsulate payload unsigned payload data.
+                    PayloadJcs payloadJcs = new PayloadJcs
+                    {
+                        UUID = uuid,
+                        Sender = CurrentUser.Username,
+                        Recipient = Recipient.Username,
+                        Ciphertext = ciphertext64,
+                        Key = ciphertextKey64,
+                        IV = iv64,
+                        Tag = tag64,
+                        Format = fileSelection.SafeFileName,
+                        Timestamp = dateTimeUtc.ToString("O")
+                    };
+
+                    byte[] signature = _encryptDecryptService.Signature(payloadJcs, privateKeyPem);
+                    string signature64 = Convert.ToBase64String(signature);
                     Payload payload = new Payload
                     {
                         UUID = uuid,
@@ -168,7 +199,8 @@ namespace SecureNotes.ViewModels
                         IV = iv64,
                         Tag = tag64,
                         Format = fileSelection.SafeFileName,
-                        Timestamp = dateTimeUtc
+                        Timestamp = dateTimeUtc,
+                        Signature = signature64
                     };
 
                     string jsonPayload = JsonSerializer.Serialize(payload);
@@ -178,7 +210,7 @@ namespace SecureNotes.ViewModels
                         using HttpResponseMessage response = await HttpService.client.PostAsync(HttpService.API_SEND_PAYLOAD, payloadContent);
                         response.EnsureSuccessStatusCode();
                         string responseBody = await response.Content.ReadAsStringAsync();
-                        FeedbackMessage = responseBody;
+                        FeedbackMessage = responseBody + $" {signature64}";
                     }
                     catch (HttpRequestException e)
                     {
