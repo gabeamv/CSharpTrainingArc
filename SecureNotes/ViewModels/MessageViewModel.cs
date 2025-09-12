@@ -120,7 +120,7 @@ namespace SecureNotes.ViewModels
             LoadUsers = new RelayCommand(async () => { await _LoadUsers(); });
             LoadMessages = new RelayCommand(async () => { await _LoadMessages(); });
             SendFiles = new RelayCommand(async () => { await CreateSendPayload(); });
-            DownloadPayload = new RelayCommand(() => { _DownloadPayload(); });
+            DownloadPayload = new RelayCommand(async () => { await _DownloadPayload(); });
         }
 
 
@@ -189,6 +189,7 @@ namespace SecureNotes.ViewModels
 
                     byte[] signature = _encryptDecryptService.Signature(payloadJcs, privateKeyPem);
                     string signature64 = Convert.ToBase64String(signature);
+
                     Payload payload = new Payload
                     {
                         UUID = uuid,
@@ -228,9 +229,17 @@ namespace SecureNotes.ViewModels
                 FeedbackMessage = "Recipient is null";
             }
         }
-
-        public void _DownloadPayload()
+        // TODO: handle when public key is not found.
+        public async Task _DownloadPayload()
         {
+            string publicKeyPem = await _http.GetPublicKey(SelectedMessage.Sender);
+
+            if (!_encryptDecryptService.Verify(SelectedMessage, publicKeyPem))
+            {
+                FeedbackMessage = "Data not trustworthy. Not decrypting.";
+                return;
+            }
+            FeedbackMessage = "Data is trustworthy. Proceeding with decryption.";
             OpenFileDialog privateKeySelection = new OpenFileDialog
             {
                 Filter = "Select Private Key (*.txt) | *.txt"    

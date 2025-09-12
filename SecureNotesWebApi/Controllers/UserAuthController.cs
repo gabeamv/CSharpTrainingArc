@@ -52,7 +52,15 @@ namespace SecureNotesWebApi.Controllers
             return NotFound($"There is no such user:\n{JsonSerializer.Serialize(userAuth)}.");
         }
 
-        // Method to delete an account.
+        // Method to get a user's public key.
+        [HttpGet("get_public_key/{username}")]
+        public async Task<ActionResult<string>> GetPublicKey([FromRoute] string username)
+        {
+            var user = await _context.UserAuths
+                .FirstOrDefaultAsync(_user => _user.Username == username);
+            if (user == null) return NotFound("No user found.");
+            return Ok(user.PublicKey);
+        }
 
     }
 }

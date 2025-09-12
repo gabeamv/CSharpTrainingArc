@@ -88,6 +88,35 @@ namespace SecureNotes.Services
                 return rsa.SignData(canon, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
             }
         }
+        
+        public bool Verify(Payload payload, string publicKeyPem)
+        {
+            // 1. Encapsulate payload object without signature into payloadJcs
+            PayloadJcs payloadJcs = new PayloadJcs
+            {
+                UUID = payload.UUID,
+                Sender = payload.Sender,
+                Recipient = payload.Recipient,
+                Ciphertext = payload.Ciphertext,
+                Key = payload.Key,
+                IV = payload.IV,
+                Tag = payload.Tag,
+                Format = payload.Format,
+                Timestamp = payload.Timestamp.ToString("O")
+            };
+            // 2. Serialize payloadJcs.
+            string payloadJcsSerial = JsonSerializer.Serialize<PayloadJcs>(payloadJcs);
+            // 3. Canonicalize payloadJcs
+            byte[] canon = Encoding.UTF8.GetBytes(payloadJcsSerial);
+
+            // 4. Create RSA instance and import public key.
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportFromPem(publicKeyPem);
+                // 5. Verify the data using RSA.VerifyData
+                return rsa.VerifyData(canon, Convert.FromBase64String(payload.Signature), HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            }
+        }
 
         public (byte[] ciphertext, byte[] key, byte[] iv, byte[] tag) AesGcmEncrypt(byte[] plaintext)
         {
