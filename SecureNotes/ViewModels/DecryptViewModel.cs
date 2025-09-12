@@ -49,7 +49,6 @@ namespace SecureNotes.ViewModels
             bool? success = fileSelection.ShowDialog();
             if (success == true)
             {
-                // TODO: To be fixed, byte to string.
                 try 
                 {
                     byte[] cipherText = _fileService.ReadAllBytes(fileSelection.FileName);                                                          

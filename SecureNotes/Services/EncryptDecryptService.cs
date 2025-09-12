@@ -14,7 +14,7 @@ namespace SecureNotes.Services
     {
         // Static aes algorithm that persists throughout the lifetime of the application.
         public static Aes AesAlg { get; private set; } = Aes.Create();
-        // TODO: Implement AesGcm
+
         public EncryptDecryptService() {
             // AesAlg.Padding = PaddingMode.None;
             

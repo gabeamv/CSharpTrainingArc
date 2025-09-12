@@ -150,8 +150,6 @@ namespace SecureNotes.ViewModels
                 {
                     string filePath = fileSelection.FileName;
                     byte[] data = _fileService.ReadAllBytes(filePath);
-                    // TODO: Implement AesGcm
-                    EncryptDecryptService.GenerateAes(); // generate a random new aes key
                     (byte[] ciphertext, byte[] key, byte[] iv, byte[] tag) = _encryptDecryptService.AesGcmEncrypt(data);
                     string ciphertext64 = Convert.ToBase64String(ciphertext);
                     string uuid = Guid.NewGuid().ToString();
