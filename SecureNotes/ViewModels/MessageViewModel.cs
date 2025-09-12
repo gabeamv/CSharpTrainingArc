@@ -134,7 +134,7 @@ namespace SecureNotes.ViewModels
         }
 
         // Method to read files, aes encrypt files, rsa encrypt the aes key, convert aes key into base64,
-        // and store into payload to be sent through http request later on.
+        // and store into payload to be sent through http request.
         // TODO: implement multiple files to be selected.
         public async Task CreateSendPayload()
         {
@@ -157,7 +157,7 @@ namespace SecureNotes.ViewModels
                     string iv64 = Convert.ToBase64String(iv);
                     string tag64 = Convert.ToBase64String(tag);
                     DateTime dateTimeUtc = DateTime.Now.ToUniversalTime();
-                    // Construct the payload
+
                     Payload payload = new Payload
                     {
                         UUID = uuid,
@@ -170,10 +170,9 @@ namespace SecureNotes.ViewModels
                         Format = fileSelection.SafeFileName,
                         Timestamp = dateTimeUtc
                     };
-                    // Serialize payload and prepare it to be sent.
+
                     string jsonPayload = JsonSerializer.Serialize(payload);
                     StringContent payloadContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                    // Make an api request to send the payload to the user.
                     try
                     {
                         using HttpResponseMessage response = await HttpService.client.PostAsync(HttpService.API_SEND_PAYLOAD, payloadContent);
@@ -200,7 +199,6 @@ namespace SecureNotes.ViewModels
 
         public void _DownloadPayload()
         {
-            // 1. Open file dialog, user selects private key.
             OpenFileDialog privateKeySelection = new OpenFileDialog
             {
                 Filter = "Select Private Key (*.txt) | *.txt"    
@@ -210,31 +208,23 @@ namespace SecureNotes.ViewModels
 
             if (success == true)
             {
-                // 2. Convert encoded base64 aes key to byte[].
                 byte[] ciphertextKey = Convert.FromBase64String(SelectedMessage.Key);
-                // 3. Decrypt byte[] aes key using user rsa private key
                 string privateKeyPem = _fileService.ReadTxtFileAsString(privateKeySelection.FileName);
                 byte[] aesGcmKey = _encryptDecryptService.RsaDecryptBytes(ciphertextKey, privateKeyPem);
-                // 4. Convert encoded base64 ciphertext to byte[].
                 byte[] ciphertext = Convert.FromBase64String(SelectedMessage.Ciphertext);
-                // 5. Convert encoded base64 IV to byte[].
                 byte[] iv = Convert.FromBase64String(SelectedMessage.IV);
-                // 6. Decrypt byte[] ciphertext using ciphertext, key, iv, tag
                 byte[] tag = Convert.FromBase64String(SelectedMessage.Tag);
                 byte[] plaintext = _encryptDecryptService.AesGcmDecrypt(ciphertext, aesGcmKey, iv, tag);
-                // 7. Open file dialog, user selects and stores directory where data will be saved.
                 OpenFileDialog fileDestination = new OpenFileDialog
                 {
                     CheckFileExists = false,
                     ValidateNames = false,
                     Multiselect = false,
-                    // 8. Append the directory string with the file name, as well as the format of the file.
                     FileName = SelectedMessage.Format
                 };
                 success = fileDestination.ShowDialog();
                 if (success == true)
                 {
-                    // 9. Write bytes to path. Generalize it for all formats instead of just .txt files.
                     _fileService.WriteAllBytes(fileDestination.FileName, plaintext);
                 }
             }

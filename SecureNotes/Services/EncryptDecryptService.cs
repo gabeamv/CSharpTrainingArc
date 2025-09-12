@@ -62,10 +62,10 @@ namespace SecureNotes.Services
         public byte[] RsaEncryptBytes(byte[] bytes, string publicKeyPem)
         {
             byte[] cipherText;
-            using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+            using (RSA rsa = RSA.Create())
             {
-                RSA.ImportFromPem(publicKeyPem);
-                cipherText = RSA.Encrypt(bytes, true);
+                rsa.ImportFromPem(publicKeyPem);
+                cipherText = rsa.Encrypt(bytes, RSAEncryptionPadding.OaepSHA256);
             }
             return cipherText;
         }
@@ -73,10 +73,10 @@ namespace SecureNotes.Services
         public byte[] RsaDecryptBytes(byte[] bytes, string privateKeyPem)
         {
             byte[] plainTextBytes;
-            using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+            using (RSA rsa = RSA.Create())
             {
-                RSA.ImportFromPem(privateKeyPem);
-                plainTextBytes = RSA.Decrypt(bytes, true);
+                rsa.ImportFromPem(privateKeyPem);
+                plainTextBytes = rsa.Decrypt(bytes, RSAEncryptionPadding.OaepSHA256);
             }
             return plainTextBytes;
         }
@@ -85,15 +85,13 @@ namespace SecureNotes.Services
         {
             byte[] ciphertext = new byte[plaintext.Length];
             byte[] iv = RandomNumberGenerator.GetBytes(12);
-            byte[] tag = new byte[16]; // authentication tag produced for message.
+            byte[] tag = new byte[16];
             byte[] key = RandomNumberGenerator.GetBytes(32);
             using (AesGcm AesGcmAlg = new AesGcm(key, 16))
             {
                 AesGcmAlg.Encrypt(iv, plaintext, ciphertext, tag);
-                return (ciphertext, key, iv, tag); // part of payload, used for decryption.
+                return (ciphertext, key, iv, tag);
             }
-            
-            
         }
 
         public byte[] AesGcmDecrypt(byte[] ciphertext, byte[] key, byte[] iv, byte[] tag)
@@ -104,13 +102,11 @@ namespace SecureNotes.Services
                 AesGcmAlg.Decrypt(iv, ciphertext, tag, plaintext);
                 return plaintext;
             }
-            
         }
 
 
         public static void ChangeAesKey(byte[] key = null, byte[] iv = null, PaddingMode mode = PaddingMode.None)
         {
-
             if (key != null) AesAlg.Key = key;
             if (iv != null) AesAlg.IV = iv;
             if (mode != PaddingMode.None) AesAlg.Padding = mode;
