@@ -12,6 +12,7 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <Button Grid.Row="0" Height="25" Width="75" Content="Logout" Command="{Binding Logout}"/>
         <StackPanel Grid.Row="1"  Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Button Margin="0, 0, 50, 0" Width="100" Height="100" Command="{Binding NavigateEncryptFile}" Padding="10">
                 <Image Source="/Assets/Images/lock.png"/>

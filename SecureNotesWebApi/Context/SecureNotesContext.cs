@@ -8,7 +8,6 @@ namespace SecureNotesWebApi.Context
             : base(options)
         {
         }
-
         public DbSet<UserAuth> UserAuths { get; set; }
         public DbSet<Payload> Messages { get; set; }
 

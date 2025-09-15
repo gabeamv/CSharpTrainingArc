@@ -38,12 +38,14 @@ namespace SecureNotes.ViewModels
         public ICommand NavigateEncryptFile { get; }
         public ICommand NavigateDecryptFile { get; }
         public ICommand NavigateMessage { get; }
+        public ICommand Logout { get; }
         public HomeViewModel(NavigationService nav, HttpService http, UserAuth user) {
             NavigateEncryptFile = new RelayCommand(() => { nav.NavigateTo(new EncryptViewModel(nav, http, user)); });
             NavigateDecryptFile = new RelayCommand(() => { nav.NavigateTo(new DecryptViewModel(nav, http, user)); });
             NavigateMessage = new RelayCommand(() => { nav.NavigateTo(new MessageViewModel(nav, http, user)); });
             ExportKey = new RelayCommand(() => { ExportUserKey(); });
             ChangeKey = new RelayCommand(() => { ImportUserKey(); });
+            Logout = new RelayCommand(() => { nav.NavigateTo(new AuthViewModel(nav, http)); });
         }
 
         private void ExportUserKey()

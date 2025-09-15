@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SecureNotesWebApi.Context;
 using SecureNotesWebApi.Models;
+using System.Security.Cryptography;
 
 namespace SecureNotesWebApi.Controllers
 {

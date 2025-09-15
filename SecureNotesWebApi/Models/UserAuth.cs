@@ -9,7 +9,8 @@ namespace SecureNotesWebApi.Models
         [Key]
         public required string Username { get; set; }
 
-        public required string HashedPassword { get; set; }
+        public required string Password { get; set; }
         public string? PublicKey { get; set; }
+        public string? Salt { get; set; }
     }
 }

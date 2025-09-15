@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using SecureNotesWebApi.Context;
 using SecureNotesWebApi.Models;
 using System.Text.Json;
+using Isopoh.Cryptography.Argon2;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 namespace SecureNotesWebApi.Controllers
 {
     [ApiController]
@@ -35,11 +38,13 @@ namespace SecureNotesWebApi.Controllers
             var user = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
             if (user != null)
             {
-                return Conflict($"There is already a user:\n{userAuth.PublicKey}");
+                return Conflict($"There is already a user.");
             }
+            userAuth.Salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16));
+            userAuth.Password = Argon2.Hash(userAuth.Password + userAuth.Salt);
             await _context.UserAuths.AddAsync(userAuth);
             await _context.SaveChangesAsync();
-            return Ok($"Successfully registered user:\n{userAuth.PublicKey}");
+            return Ok($"Successfully registered user. Hashed password {userAuth.Password}");
         }
 
         // Method to login a user.
@@ -48,7 +53,7 @@ namespace SecureNotesWebApi.Controllers
         {
             var user = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
             // TODO: Implement JWT
-            if (user != null && user.HashedPassword == userAuth.HashedPassword) return Ok($"Successfully logged in user:\n{JsonSerializer.Serialize(userAuth)}");
+            if (user != null && user.Password == Argon2.Hash(userAuth.Password + user.Salt)) return Ok($"Successfully logged in user:\n{JsonSerializer.Serialize(userAuth)}");
             return NotFound($"There is no such user:\n{JsonSerializer.Serialize(userAuth)}.");
         }
 
