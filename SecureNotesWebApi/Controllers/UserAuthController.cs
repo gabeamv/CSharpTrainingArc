@@ -6,6 +6,8 @@ using System.Text.Json;
 using Isopoh.Cryptography.Argon2;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using NuGet.Packaging.Signing;
 namespace SecureNotesWebApi.Controllers
 {
     [ApiController]
@@ -40,8 +42,14 @@ namespace SecureNotesWebApi.Controllers
             {
                 return Conflict($"There is already a user.");
             }
-            userAuth.Salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16));
-            userAuth.Password = Argon2.Hash(userAuth.Password + userAuth.Salt);
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            Argon2Config config = new Argon2Config
+            {
+                Salt = salt,
+                Password = Encoding.UTF8.GetBytes(userAuth.Password)
+            };
+            userAuth.Salt = Convert.ToBase64String(salt);
+            userAuth.Password = Argon2.Hash(config);
             await _context.UserAuths.AddAsync(userAuth);
             await _context.SaveChangesAsync();
             return Ok($"Successfully registered user. Hashed password {userAuth.Password}");
@@ -53,8 +61,16 @@ namespace SecureNotesWebApi.Controllers
         {
             var user = await _context.UserAuths.FirstOrDefaultAsync(u => u.Username == userAuth.Username);
             // TODO: Implement JWT
-            if (user != null && user.Password == Argon2.Hash(userAuth.Password + user.Salt)) return Ok($"Successfully logged in user:\n{JsonSerializer.Serialize(userAuth)}");
-            return NotFound($"There is no such user:\n{JsonSerializer.Serialize(userAuth)}.");
+            if (user != null)
+            {
+                Argon2Config config = new Argon2Config
+                {
+                    Salt = Convert.FromBase64String(user.Salt),
+                    Password = Encoding.UTF8.GetBytes(userAuth.Password)
+                };
+                if (Argon2.Verify(user.Password, config)) return Ok($"Successfully logged in user.");
+            }
+            return Unauthorized($"There is no such user.");
         }
 
         // Method to get a user's public key.
