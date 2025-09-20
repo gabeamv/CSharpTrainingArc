@@ -232,6 +232,7 @@ namespace SecureNotes.ViewModels
         // TODO: handle when public key is not found.
         public async Task _DownloadPayload()
         {
+            if (SelectedMessage == null) return;
             string publicKeyPem = await _http.GetPublicKey(SelectedMessage.Sender);
 
             if (!_encryptDecryptService.Verify(SelectedMessage, publicKeyPem))
