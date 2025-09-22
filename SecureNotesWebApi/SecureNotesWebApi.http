@@ -20,7 +20,7 @@ Content-Type: application/json
 
 {
   "username": "gabeamv",
-  "hashedPassword": "test123"
+  "password": "test123"
 }
 
 ###
@@ -47,8 +47,10 @@ Content-Type: application/json
   "ciphertext": "testCiphertext",
   "key": "testKey",
   "iv": "testIV",
+  "tag": "testTag",
   "format": "testFormat",
-  "timestamp": "2025-08-24T17:30:00Z"
+  "timestamp": "2025-08-24T17:30:00Z",
+  "signature": "testSignature"
 }
 
 ###
