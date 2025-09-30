@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FoundationalProjects", "Fou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureNotesWebApi", "SecureNotesWebApi\SecureNotesWebApi.csproj", "{E43EA6ED-BB54-4E3F-8F72-6CED56B4BA02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stocks", "Stocks\Stocks.csproj", "{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{E43EA6ED-BB54-4E3F-8F72-6CED56B4BA02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E43EA6ED-BB54-4E3F-8F72-6CED56B4BA02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E43EA6ED-BB54-4E3F-8F72-6CED56B4BA02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{F2A474C1-427B-42D0-A982-06AE5D230116} = {FB4D3841-E417-4289-8DB7-DDA3855E101D}
 		{CD68383A-E5AE-434F-ACFF-34E4EC1747F7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{E43EA6ED-BB54-4E3F-8F72-6CED56B4BA02} = {FB4D3841-E417-4289-8DB7-DDA3855E101D}
+		{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C62AFD67-2885-49E2-B13B-EAB5DF220F92}
