@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Gamba
 {
-    internal class Player
+    public class Player
     {
+        public Player()
+        {
+
+        }
     }
 }

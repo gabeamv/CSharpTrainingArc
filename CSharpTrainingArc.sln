@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FoundationalProjects", "Fou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureNotesWebApi", "SecureNotesWebApi\SecureNotesWebApi.csproj", "{E43EA6ED-BB54-4E3F-8F72-6CED56B4BA02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stocks", "Stocks\Stocks.csproj", "{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gamba", "Stocks\Gamba.csproj", "{DEB138D4-0D3F-4300-B7ED-2AEAD5E3795A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
