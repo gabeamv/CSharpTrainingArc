@@ -166,7 +166,6 @@ namespace SecureNotes.ViewModels
             }
             
         }
-
         private async Task Login()
         {
             UserAuth user = new UserAuth(UsernameText, PasswordText);
@@ -187,5 +186,7 @@ namespace SecureNotes.ViewModels
             }
             
         }
+        // TODO: utilize System.Security.Cryptographpy.X509Certificates namespace to securely store private keys.
+
     }
 }
