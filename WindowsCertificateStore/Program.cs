@@ -44,13 +44,30 @@ namespace WindowsCertificateStore
             };
 
             // Add a property of length 3072 so the OS knows how big the key will be.
-            keyParams.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(3072), CngPropertyOptions.None));
+            //keyParams.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(3072), CngPropertyOptions.None));
 
             // Create the key within the OS.
-            using CngKey cngKey = CngKey.Create(CngAlgorithm.Rsa, "private_key_gabeamv", keyParams);
+            //using CngKey cngKey = CngKey.Create(CngAlgorithm.Rsa, "private_key_gabeamv", keyParams);
             
-            using RSA rsa = new RSACng(cngKey);
+            //using RSA rsa = new RSACng(cngKey);
+            //Console.WriteLine(rsa.ExportSubjectPublicKeyInfoPem());
+
+            /*
+            CertificateRequest certRequest = new CertificateRequest("CN=SecureNotes-gabeamv", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            X509Certificate2 cert = certRequest.CreateSelfSigned(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(10));
+            Console.WriteLine(cert.HasPrivateKey);
+            myStore.Add(cert);
+            myStore.Close();
+            */
+            var cert = myStore.Certificates
+                .Find(X509FindType.FindBySubjectName, "SecureNotes-gabeamv", false)
+                .FirstOrDefault();
+            RSA rsa2 = cert.GetRSAPrivateKey();
+            Console.WriteLine(rsa2.ExportSubjectPublicKeyInfoPem());
+            RSA rsa = new RSACng(CngKey.Open("private_key_gabeamv"));
             Console.WriteLine(rsa.ExportSubjectPublicKeyInfoPem());
+
+
         }
     }
 }
