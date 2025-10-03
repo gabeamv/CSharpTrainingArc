@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Printing;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -160,6 +161,7 @@ namespace SecureNotes.ViewModels
                     DateTime dateTimeUtc = DateTime.UtcNow;
 
                     // 1. Select private key.
+                    /*
                     OpenFileDialog privateKeySelection = new OpenFileDialog();
                     privateKeySelection.Filter = "Select Key (*.*)|*.*";
                     success = privateKeySelection.ShowDialog();
@@ -172,6 +174,7 @@ namespace SecureNotes.ViewModels
                     {
                         // Throw exception if not chosen
                     }
+                    */
 
                     // 2. Encapsulate payload unsigned payload data.
                     PayloadJcs payloadJcs = new PayloadJcs
@@ -187,7 +190,7 @@ namespace SecureNotes.ViewModels
                         Timestamp = dateTimeUtc.ToString("O")
                     };
 
-                    byte[] signature = _encryptDecryptService.Signature(payloadJcs, privateKeyPem);
+                    byte[] signature = _encryptDecryptService.SignatureCng(payloadJcs, _currentUser.Username);
                     string signature64 = Convert.ToBase64String(signature);
 
                     Payload payload = new Payload
@@ -241,13 +244,44 @@ namespace SecureNotes.ViewModels
                 return;
             }
             FeedbackMessage = "Data is trustworthy. Proceeding with decryption.";
+
+            /*
             OpenFileDialog privateKeySelection = new OpenFileDialog
             {
                 Filter = "Select Private Key (*.txt) | *.txt"    
             };
 
             bool? success = privateKeySelection.ShowDialog();
-
+            */
+            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadWrite);
+            var cert = store.Certificates
+                .Find(X509FindType.FindBySubjectName, $"SecureNotes-{_currentUser.Username}", false)
+                .FirstOrDefault() ?? throw new CryptographicException();
+            
+            using (RSA rsa = cert.GetRSAPrivateKey() ?? throw new CryptographicException())
+            {
+                byte[] ciphertextKey = Convert.FromBase64String(SelectedMessage.Key);
+                byte[] aesGcmKey = rsa.Decrypt(ciphertextKey, RSAEncryptionPadding.OaepSHA256);
+                byte[] ciphertext = Convert.FromBase64String(SelectedMessage.Ciphertext);
+                byte[] iv = Convert.FromBase64String(SelectedMessage.IV);
+                byte[] tag = Convert.FromBase64String(SelectedMessage.Tag);
+                byte[] plaintext = _encryptDecryptService.AesGcmDecrypt(ciphertext, aesGcmKey, iv, tag);
+                OpenFileDialog fileDestination = new OpenFileDialog
+                {
+                    CheckFileExists = false,
+                    ValidateNames = false,
+                    Multiselect = false,
+                    FileName = SelectedMessage.Format
+                };
+                bool? success = fileDestination.ShowDialog();
+                if (success == true)
+                {
+                    _fileService.WriteAllBytes(fileDestination.FileName, plaintext);
+                }
+            }
+            
+            /*
             if (success == true)
             {
                 byte[] ciphertextKey = Convert.FromBase64String(SelectedMessage.Key);
@@ -270,7 +304,10 @@ namespace SecureNotes.ViewModels
                     _fileService.WriteAllBytes(fileDestination.FileName, plaintext);
                 }
             }
+            */
         }
+
+
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
         {

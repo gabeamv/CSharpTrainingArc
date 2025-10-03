@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.Json;
@@ -89,6 +90,23 @@ namespace SecureNotes.Services
             }
         }
         
+        public byte[] SignatureCng(PayloadJcs payloadJcs, string username)
+        {
+            String payloadJcsSerial = JsonSerializer.Serialize<PayloadJcs>(payloadJcs);
+            byte[] canon = Encoding.UTF8.GetBytes(payloadJcsSerial);
+            // Get rsa key from Windows Software Key Storage Provider using certificate.
+            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+            var cert = store.Certificates
+                .Find(X509FindType.FindBySubjectName, $"SecureNotes-{username}", false)
+                .FirstOrDefault() ?? throw new CryptographicException();
+            using (RSA rsa = cert.GetRSAPrivateKey() ?? throw new CryptographicException())
+            {
+                return rsa.SignData(canon, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            }
+
+        }
+
         public bool Verify(Payload payload, string publicKeyPem)
         {
             // 1. Encapsulate payload object without signature into payloadJcs
