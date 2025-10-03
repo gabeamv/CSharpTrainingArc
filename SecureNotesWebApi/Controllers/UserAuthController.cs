@@ -83,5 +83,15 @@ namespace SecureNotesWebApi.Controllers
             return Ok(user.PublicKey);
         }
 
+        // Method to verify if a user is registered or not.
+        [HttpGet("is_registered/{username}")]
+        public async Task<IActionResult> CanRegister([FromRoute] string username)
+        {
+            var user = await _context.UserAuths
+                .FirstOrDefaultAsync(_user => _user.Username == username);
+            if (user == null) return Ok();
+            return Conflict();
+        }
+
     }
 }

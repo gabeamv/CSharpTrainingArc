@@ -14,6 +14,7 @@ namespace SecureNotes.Services
     {
         public static readonly HttpClient client = new HttpClient();
         public static readonly string API = "https://localhost:7042/api";
+        public static readonly string API_REGISTER = API + "/userauth/register/";
         public static readonly string API_SEND_PAYLOAD = API + "/payload/send";
         public static readonly string API_GET_ALL_MESSAGES = API + "/payload/received_messages/";
         public static readonly string API_GET_PUBLIC_KEY = API + "/userauth/get_public_key/";
@@ -38,6 +39,22 @@ namespace SecureNotes.Services
             }
         }
 
+        public async Task<HttpResponseMessage> Register(UserAuth userAuth)
+        {
+            string userJson = JsonSerializer.Serialize(userAuth);
+            StringContent userJsonContent = new StringContent(userJson, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await HttpService.client.PostAsync(API_REGISTER, userJsonContent);
+            return response;
+        }
+
+        public async Task<bool> CanRegister(string username)
+        {
+            using (HttpResponseMessage response = await HttpService.client.GetAsync(API + $"/userauth/is_registered/{username}"))
+            {
+                return response.IsSuccessStatusCode;
+            }
+        }
+
         public async Task<List<Payload>> GetAllMessages(string username)
         {
             using (HttpResponseMessage response = await HttpService.client.GetAsync(API_GET_ALL_MESSAGES + username))
@@ -49,7 +66,6 @@ namespace SecureNotes.Services
                 }
                 return new List<Payload>();
             }
-            
         }
 
         public async Task<string> GetPublicKey(string username)

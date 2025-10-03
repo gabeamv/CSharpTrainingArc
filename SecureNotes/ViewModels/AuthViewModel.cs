@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -96,7 +97,7 @@ namespace SecureNotes.ViewModels
             RegisterCommand = new RelayCommand(() => { 
                 try
                 {
-                    _ = Register();
+                    _ = RegisterCng();
                 }
                 catch (HttpRequestException e)
                 {
@@ -162,6 +163,44 @@ namespace SecureNotes.ViewModels
                 catch (DirectoryNotFoundException e)
                 {
                     FeedbackMessage = e.Message;
+                }
+            }
+            
+        }
+        // Register using Microsoft Software Key Storage Provider with Cryptography API: Next Generation (CNG)
+        private async Task RegisterCng()
+        {
+            if (!await _http.CanRegister(UsernameText))
+            {
+                FeedbackMessage = "User already exists.";
+                return;
+            }
+            CngKeyCreationParameters keyParams = new CngKeyCreationParameters
+            {
+                ExportPolicy = CngExportPolicies.None,
+                KeyCreationOptions = CngKeyCreationOptions.OverwriteExistingKey, // for testing
+                KeyUsage = CngKeyUsages.Signing | CngKeyUsages.Decryption
+            };
+
+            keyParams.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(3072), CngPropertyOptions.None));
+            CngKey cng = CngKey.Create(CngAlgorithm.Rsa, $"SecureNotes-PK-{UsernameText}", keyParams);
+            
+            using (RSA rsa = new RSACng(cng))
+            { 
+                X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadWrite);
+                // TODO: later implement certificate authority to sign certificates
+                CertificateRequest certRequest = new CertificateRequest($"CN=SecureNotes-{UsernameText}", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                X509Certificate2 cert = certRequest.CreateSelfSigned(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(10));
+                store.Add(cert);
+                store.Close();
+                // TODO: store certificates in database instead of public keys
+                UserAuth user = new UserAuth(UsernameText, PasswordText, publicKey: rsa.ExportSubjectPublicKeyInfoPem());
+                using (HttpResponseMessage response = await _http.Register(user))
+                {
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    FeedbackMessage = responseBody;
                 }
             }
             
