@@ -14,20 +14,21 @@
         </Grid.RowDefinitions>
         <Button Grid.Row="0" Height="25" Width="75" Content="Logout" Command="{Binding Logout}"/>
         <StackPanel Grid.Row="1"  Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Button Margin="0, 0, 50, 0" Width="100" Height="100" Command="{Binding NavigateEncryptFile}" Padding="10">
+            <Button Margin="0, 0, 50, 0" Width="100" Height="100" Command="{Binding NavigateSecrets}" Padding="10">
                 <Image Source="/Assets/Images/lock.png"/>
             </Button>
             <Button Width="100" Height="100" Command="{Binding NavigateMessage}" Padding="10">
                 <Image Source="/Assets/Images/message.png"/>
             </Button>
-            <Button Margin="50, 0, 0, 0" Width="100" Height="100" Command="{Binding NavigateDecryptFile}" Padding="10">
+            <!-- <Button Margin="50, 0, 0, 0" Width="100" Height="100" Command="{Binding NavigateDecryptFile}" Padding="10">
                 <Image Source="/Assets/Images/key.png"/>
-            </Button>
+            </Button> -->
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+        
+        <!-- <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Content="Export Key and IV" Command="{Binding ExportKey}" Height="30" Width="100" Margin="0, 0, 50, 0"/>
             <Button Content="Import Key and IV" Command="{Binding ChangeKey}" Height="30" Width="100" Margin="50, 0, 0, 0"/>
-        </StackPanel>
+        </StackPanel> -->
         <TextBlock Grid.Row ="0" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"
                    Text="{Binding FeedbackMessage}"/>
 
