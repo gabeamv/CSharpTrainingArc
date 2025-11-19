@@ -19,23 +19,28 @@ namespace SecureNotes.ViewModels
 {
     public class SecretsViewModel : INotifyPropertyChanged
     {
+        public const string KEY_NAME_PREFIX = "SecureNotes-";
 
-        EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
-        FileService _fileService = new FileService();
+        private EncryptDecryptService _encryptDecryptService = new EncryptDecryptService();
+        private FileService _fileService = new FileService();
+        private JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
-        private string _secret;
+        private string _secretMessage;
         private UserAuth _user;
 
         public ICommand SaveCommand { get; }
         public ICommand ReadCommand { get; }
         public ICommand NavigateHome { get; }
 
-        public string Secret
+        public string SecretMessage
         {
-            get { return _secret; }
+            get { return _secretMessage; }
             set
             {
-                _secret = value;
+                _secretMessage = value;
                 OnPropertyChanged();
             }
         }
@@ -51,7 +56,7 @@ namespace SecureNotes.ViewModels
         public void Save() 
         {
             // Convert message into bytes.
-            byte[] plaintext = Encoding.UTF8.GetBytes(Secret);
+            byte[] plaintext = Encoding.UTF8.GetBytes(SecretMessage);
             // Generate random AES-GCM key and encrypt the bytes of the message.
             (byte[] ciphertextMessage, byte[] key, byte[] iv, byte[] tag) = _encryptDecryptService.AesGcmEncrypt(plaintext);
             // Get public key using windows cert store and encrypt aes key with it.
@@ -60,7 +65,7 @@ namespace SecureNotes.ViewModels
             {
                 store.Open(OpenFlags.ReadOnly);
                 var cert = store.Certificates
-                    .Find(X509FindType.FindBySubjectName, $"SecureNotes-{_user.Username}", false)
+                    .Find(X509FindType.FindBySubjectName, KEY_NAME_PREFIX + _user.Username, false)
                     .FirstOrDefault() ?? throw new CryptographicException();
 
                 RSA rsaKey = cert.GetRSAPublicKey() ?? throw new CryptographicException();
@@ -74,7 +79,7 @@ namespace SecureNotes.ViewModels
                 Convert.ToBase64String(tag),
                 Convert.ToBase64String(ciphertextMessage)
                 );
-            String json = JsonSerializer.Serialize<Secret>(userSecret);
+            String json = JsonSerializer.Serialize<Secret>(userSecret, _jsonOptions);
             // Store the string data into a txt file.
             OpenFileDialog path = new OpenFileDialog
             {
@@ -92,12 +97,54 @@ namespace SecureNotes.ViewModels
         public void Read() 
         {
             // Openfile dialog to select file
-            // Read the string form the file
-            // Deserialize the string into an object
-            // Convert base64 fields into byte[]
-            // Decrypt aes-gcm key and store in an instance
-            // Use aes-gcm key, iv, and tag to decrypt encrypted message
-            // Assign field that displays messages with the message plaintext
+            OpenFileDialog path = new OpenFileDialog
+            {
+                Multiselect = false
+            };
+            bool? success = path.ShowDialog();
+            if (success == true) 
+            {
+                try
+                {
+                    // Read the string form the file
+                    string json = _fileService.ReadTxtFileAsString(path.FileName);
+                    SecretMessage = json;
+                    // Deserialize the string into an object
+                    Secret secret = JsonSerializer.Deserialize<Secret>(json, _jsonOptions) ?? throw new JsonException();
+                    // Convert base64 fields into byte[]
+                    byte[] ciphertextKey = Convert.FromBase64String(secret.CiphertextKey);
+                    byte[] iv = Convert.FromBase64String(secret.IV);
+                    byte[] tag = Convert.FromBase64String(secret.Tag);
+                    byte[] ciphertextMessage = Convert.FromBase64String(secret.CiphertextMessage);
+                    // Decrypt aes-gcm key using private RSA key and store in an instance
+                    byte[] key;
+                    using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+                    {
+                        store.Open(OpenFlags.ReadOnly);
+                        var cert = store.Certificates
+                            .Find(X509FindType.FindBySubjectName, KEY_NAME_PREFIX + _user.Username, false)
+                            .FirstOrDefault() ?? throw new CryptographicException();
+                        key = _encryptDecryptService.RsaDecryptBytes(ciphertextKey, cert.GetRSAPrivateKey() ?? throw new CryptographicException());
+                    }
+                    // Use aes-gcm key, iv, and tag to decrypt encrypted message
+                    byte[] plaintext = _encryptDecryptService.AesGcmDecrypt(ciphertextMessage, key, iv, tag);
+                    // Assign field that displays messages with the message plaintext
+                    SecretMessage = Encoding.UTF8.GetString(plaintext);
+                }
+                catch (JsonException e)
+                {
+                    SecretMessage = "Json exception.";
+                }
+                catch (CryptographicException e)
+                {
+                    SecretMessage = "Cryptographic Exception";
+                }
+                catch (InvalidOperationException e)
+                {
+                    SecretMessage = "Invalid Operation Exception";
+                }
+            }
+                
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

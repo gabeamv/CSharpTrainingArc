@@ -178,7 +178,7 @@ namespace SecureNotes.ViewModels
             CngKeyCreationParameters keyParams = new CngKeyCreationParameters
             {
                 ExportPolicy = CngExportPolicies.None,
-                KeyCreationOptions = CngKeyCreationOptions.OverwriteExistingKey, // for testing
+                KeyCreationOptions = CngKeyCreationOptions.OverwriteExistingKey, // TODO: Overwrite key for testing
                 KeyUsage = CngKeyUsages.Signing | CngKeyUsages.Decryption
             };
 

@@ -70,13 +70,23 @@ namespace SecureNotes.Services
 
         public byte[] RsaDecryptBytes(byte[] bytes, string privateKeyPem)
         {
-            byte[] plainTextBytes;
+            byte[] plaintext;
             using (RSA rsa = RSA.Create())
             {
                 rsa.ImportFromPem(privateKeyPem);
-                plainTextBytes = rsa.Decrypt(bytes, RSAEncryptionPadding.OaepSHA256);
+                plaintext = rsa.Decrypt(bytes, RSAEncryptionPadding.OaepSHA256);
             }
-            return plainTextBytes;
+            return plaintext;
+        }
+
+        public byte[] RsaDecryptBytes(byte[] bytes, RSA key)
+        {
+            byte[] plaintext;
+            using (RSA rsa = key)
+            {
+                plaintext = rsa.Decrypt(bytes, RSAEncryptionPadding.OaepSHA256);
+            }
+            return plaintext;
         }
 
         public byte[] Signature(PayloadJcs payloadJcs, string privateKeyPem)

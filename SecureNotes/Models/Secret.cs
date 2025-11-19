@@ -8,16 +8,16 @@ namespace SecureNotes.Models
 {
     public class Secret
     {
-        public string _CiphertextKey { get; }
-        public string _IV { get; }
-        public string _Tag { get; }
-        public string _CiphertextMessage { get; }
+        public string CiphertextKey { get; }
+        public string IV { get; }
+        public string Tag { get; }
+        public string CiphertextMessage { get; }
         public Secret(string ciphertextKey, string iv, string tag, string ciphertextMessage)
         {
-            _CiphertextKey = ciphertextKey;
-            _IV = iv;
-            _Tag = tag;
-            _CiphertextMessage = ciphertextMessage;
+            CiphertextKey = ciphertextKey;
+            IV = iv;
+            Tag = tag;
+            CiphertextMessage = ciphertextMessage;
         }
     }
 }
