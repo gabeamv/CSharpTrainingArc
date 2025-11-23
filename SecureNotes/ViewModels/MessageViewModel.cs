@@ -262,7 +262,7 @@ namespace SecureNotes.ViewModels
             using (RSA rsa = cert.GetRSAPrivateKey() ?? throw new CryptographicException())
             {
                 byte[] ciphertextKey = Convert.FromBase64String(SelectedMessage.Key);
-                byte[] aesGcmKey = rsa.Decrypt(ciphertextKey, RSAEncryptionPadding.OaepSHA256);
+                byte[] aesGcmKey = _encryptDecryptService.RsaDecryptBytes(ciphertextKey, rsa);
                 byte[] ciphertext = Convert.FromBase64String(SelectedMessage.Ciphertext);
                 byte[] iv = Convert.FromBase64String(SelectedMessage.IV);
                 byte[] tag = Convert.FromBase64String(SelectedMessage.Tag);
