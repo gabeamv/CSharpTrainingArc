@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using SecureNotesWebApi.Context;
 namespace SecureNotesWebApi
@@ -15,8 +14,9 @@ namespace SecureNotesWebApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<SecureNotesContext>(opt =>
-                opt.UseInMemoryDatabase("SecureNotesDB"));
+            builder.Services.AddDbContext<SecureNotesContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase"))
+            );
 
             var app = builder.Build();
 
