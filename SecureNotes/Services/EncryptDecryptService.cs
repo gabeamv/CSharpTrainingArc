@@ -100,10 +100,9 @@ namespace SecureNotes.Services
             }
         }
         
-        public byte[] SignatureCng(PayloadJcs payloadJcs, string username)
+        // TODO: Refactor to receive concatenated bytes of important data that must not be changed.
+        public byte[] SignatureCng(byte[] bytes, string username)
         {
-            String payloadJcsSerial = JsonSerializer.Serialize<PayloadJcs>(payloadJcs);
-            byte[] canon = Encoding.UTF8.GetBytes(payloadJcsSerial);
             // Get rsa key from Windows Software Key Storage Provider using certificate.
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
@@ -112,37 +111,31 @@ namespace SecureNotes.Services
                 .FirstOrDefault() ?? throw new CryptographicException();
             using (RSA rsa = cert.GetRSAPrivateKey() ?? throw new CryptographicException())
             {
-                return rsa.SignData(canon, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                return rsa.SignData(bytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
             }
 
         }
 
         public bool Verify(Payload payload, string publicKeyPem)
         {
-            // 1. Encapsulate payload object without signature into payloadJcs
-            PayloadJcs payloadJcs = new PayloadJcs
-            {
-                UUID = payload.UUID,
-                Sender = payload.Sender,
-                Recipient = payload.Recipient,
-                Ciphertext = payload.Ciphertext,
-                Key = payload.Key,
-                IV = payload.IV,
-                Tag = payload.Tag,
-                Format = payload.Format,
-                Timestamp = payload.Timestamp.ToString("O")
-            };
-            // 2. Serialize payloadJcs.
-            string payloadJcsSerial = JsonSerializer.Serialize<PayloadJcs>(payloadJcs);
-            // 3. Canonicalize payloadJcs
-            byte[] canon = Encoding.UTF8.GetBytes(payloadJcsSerial);
-
+            byte[] ciphertext = Convert.FromBase64String(payload.Ciphertext);
+            byte[] ciphertextKey = Convert.FromBase64String(payload.Key);
+            byte[] iv = Convert.FromBase64String(payload.IV);
+            byte[] tag = Convert.FromBase64String(payload.Tag);
+            
+            // Concatenate byte arrays of data to verify.
+            byte[] toVerify = new byte[ciphertext.Length + ciphertextKey.Length + iv.Length + tag.Length];
+            Array.Copy(ciphertext, 0, toVerify, 0, ciphertext.Length);
+            Array.Copy(ciphertextKey, 0, toVerify, ciphertext.Length, ciphertextKey.Length);
+            Array.Copy(iv, 0, toVerify, ciphertext.Length + ciphertextKey.Length, iv.Length);
+            Array.Copy(tag, 0, toVerify, ciphertext.Length + ciphertextKey.Length + iv.Length, tag.Length);
+ 
             // 4. Create RSA instance and import public key.
             using (RSA rsa = RSA.Create())
             {
                 rsa.ImportFromPem(publicKeyPem);
                 // 5. Verify the data using RSA.VerifyData
-                return rsa.VerifyData(canon, Convert.FromBase64String(payload.Signature), HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                return rsa.VerifyData(toVerify, Convert.FromBase64String(payload.Signature), HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
             }
         }
 

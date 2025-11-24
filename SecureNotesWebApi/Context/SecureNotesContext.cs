@@ -8,6 +8,12 @@ namespace SecureNotesWebApi.Context
             : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+
         public DbSet<UserAuth> UserAuths { get; set; }
         public DbSet<Payload> Messages { get; set; }
 

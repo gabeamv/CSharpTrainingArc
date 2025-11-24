@@ -153,11 +153,8 @@ namespace SecureNotes.ViewModels
                     string filePath = fileSelection.FileName;
                     byte[] data = _fileService.ReadAllBytes(filePath);
                     (byte[] ciphertext, byte[] key, byte[] iv, byte[] tag) = _encryptDecryptService.AesGcmEncrypt(data);
-                    string ciphertext64 = Convert.ToBase64String(ciphertext);
                     string uuid = Guid.NewGuid().ToString();
-                    string ciphertextKey64 = Convert.ToBase64String(_encryptDecryptService.RsaEncryptBytes(key, Recipient.PublicKey));
-                    string iv64 = Convert.ToBase64String(iv);
-                    string tag64 = Convert.ToBase64String(tag);
+                    byte[] ciphertextKey = _encryptDecryptService.RsaEncryptBytes(key, Recipient.PublicKey);
                     DateTime dateTimeUtc = DateTime.UtcNow;
 
                     // 1. Select private key.
@@ -176,6 +173,8 @@ namespace SecureNotes.ViewModels
                     }
                     */
 
+                    /*
+
                     // 2. Encapsulate payload unsigned payload data.
                     PayloadJcs payloadJcs = new PayloadJcs
                     {
@@ -189,22 +188,28 @@ namespace SecureNotes.ViewModels
                         Format = fileSelection.SafeFileName,
                         Timestamp = dateTimeUtc.ToString("O")
                     };
+                    */
 
-                    byte[] signature = _encryptDecryptService.SignatureCng(payloadJcs, _currentUser.Username);
-                    string signature64 = Convert.ToBase64String(signature);
-
+                    // Concatenate byte arrays of data to sign.
+                    byte[] toSign = new byte[ciphertext.Length + ciphertextKey.Length + iv.Length + tag.Length];
+                    Array.Copy(ciphertext, 0, toSign, 0, ciphertext.Length);
+                    Array.Copy(ciphertextKey, 0, toSign, ciphertext.Length, ciphertextKey.Length);
+                    Array.Copy(iv, 0, toSign, ciphertext.Length + ciphertextKey.Length, iv.Length);
+                    Array.Copy(tag, 0, toSign, ciphertext.Length + ciphertextKey.Length + iv.Length, tag.Length);
+                    // Sign the data
+                    byte[] signature = _encryptDecryptService.SignatureCng(toSign, _currentUser.Username);
                     Payload payload = new Payload
                     {
                         UUID = uuid,
                         Sender = CurrentUser.Username,
                         Recipient = Recipient.Username,
-                        Ciphertext = ciphertext64,
-                        Key = ciphertextKey64,
-                        IV = iv64,
-                        Tag = tag64,
+                        Ciphertext = Convert.ToBase64String(ciphertext),
+                        Key = Convert.ToBase64String(ciphertextKey),
+                        IV = Convert.ToBase64String(iv),
+                        Tag = Convert.ToBase64String(tag),
                         Format = fileSelection.SafeFileName,
                         Timestamp = dateTimeUtc,
-                        Signature = signature64
+                        Signature = Convert.ToBase64String(signature)
                     };
 
                     string jsonPayload = JsonSerializer.Serialize(payload);
@@ -214,7 +219,7 @@ namespace SecureNotes.ViewModels
                         using HttpResponseMessage response = await HttpService.client.PostAsync(HttpService.API_SEND_PAYLOAD, payloadContent);
                         response.EnsureSuccessStatusCode();
                         string responseBody = await response.Content.ReadAsStringAsync();
-                        FeedbackMessage = responseBody + $" {signature64}";
+                        FeedbackMessage = responseBody + $" {payload.Signature}";
                     }
                     catch (HttpRequestException e)
                     {

@@ -12,7 +12,7 @@ using SecureNotesWebApi.Context;
 namespace SecureNotesWebApi.Migrations
 {
     [DbContext(typeof(SecureNotesContext))]
-    [Migration("20251123082117_init")]
+    [Migration("20251124063115_init")]
     partial class init
     {
         /// <inheritdoc />
