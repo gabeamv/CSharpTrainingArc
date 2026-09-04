@@ -105,8 +105,8 @@ namespace SecureNotes.ViewModels
                 }
             });
             FeedbackMessage = "This is for feedback.";
-            UsernameText = "gabeamv";
-            PasswordText = "Test123";
+            UsernameText = "";
+            PasswordText = "";
         }
 
         protected void OnPropertyChanged([CallerMemberName] string stringProperty = null)
